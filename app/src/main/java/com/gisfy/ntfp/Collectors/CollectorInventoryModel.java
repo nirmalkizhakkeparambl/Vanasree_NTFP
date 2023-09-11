@@ -11,6 +11,7 @@ public class CollectorInventoryModel {
     private String NTFPType;
     private String Unit;
     private String Quantity;
+    private String loseAmound="";
     private String Date;
     private int PayStatus;
     private int VSSStatus;

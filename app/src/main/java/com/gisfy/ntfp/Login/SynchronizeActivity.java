@@ -60,12 +60,13 @@ public class SynchronizeActivity extends AppCompatActivity {
                json.put("VSSId",user.getVid()+"");
                json.put("DivisionId",user.getDivisionId()+"");
                json.put("RangeId",user.getRangeId()+"");
-               Log.i("Request60get",json.toString());
+               Log.i("Request60get",json.toString()+"");
 
                Call<List<Collector>> CollectorSelect = RetrofitClient.getInstance().getMyApi().CollectorSelect(json);
                CollectorSelect.enqueue(new Callback<List<Collector>>() {
                    @Override
                    public void onResponse(Call<List<Collector>> call, Response<List<Collector>> response) {
+                       Log.i("respppp70",response+"");
                        if (response.isSuccessful()&&response.body().get(0).getUid()!=null) {
                            List<Collector> heroList = response.body();
                            Log.i("ListSize69",heroList.size()+"");
@@ -74,7 +75,7 @@ public class SynchronizeActivity extends AppCompatActivity {
 
                                HashMap<String,String> jsonFamily=new HashMap<>();
                                jsonFamily.put("Cid",model.getCid()+"");
-                               Call<List<FamilyData>> FamilyDataSelect = RetrofitClient.getInstance().getMyApi().MemberListSelect(jsonFamily);
+                                   Call<List<FamilyData>> FamilyDataSelect = RetrofitClient.getInstance().getMyApi().MemberListSelect(jsonFamily);
                                FamilyDataSelect.enqueue(new Callback<List<FamilyData>>() {
                                    @Override
                                    public void onResponse(Call<List<FamilyData>> call, Response<List<FamilyData>> response) {
@@ -90,9 +91,9 @@ public class SynchronizeActivity extends AppCompatActivity {
                                    public void onFailure(Call<List<FamilyData>> call, Throwable t) {
                                    }
                                });
-
-
                            }
+
+
                        }
                    }
                    @Override
@@ -136,6 +137,21 @@ public class SynchronizeActivity extends AppCompatActivity {
                    public void onFailure(Call<List<InventoryEntity>> call, Throwable t) {
                    }
                });
+//               Call<List<CollectorsModel>> ColectorSelect = RetrofitClient.getInstance().getMyApi().CollectorSelect(json);
+//               ColectorSelect.enqueue(new Callback<List<CollectorsModel>>() {
+//                   @Override
+//                   public void onResponse(Call<List<CollectorsModel>> call, retrofit2.Response<List<CollectorsModel>> response) {
+//                       if (response.isSuccessful()&&response.body().get(0).getRandom()!=null) {
+//                           List<CollectorsModel> heroList = response.body();
+//                           for (CollectorsModel model:heroList){
+//                               db.Insert(model);
+//                           }
+//                       }
+//                   }
+//                   @Override
+//                   public void onFailure(Call<List<StocksModel>> call, Throwable t) {
+//                   }
+//               });
 
 
                Call<List<StocksModel>> stockSelect = RetrofitClient.getInstance().getMyApi().stockSelect(json);

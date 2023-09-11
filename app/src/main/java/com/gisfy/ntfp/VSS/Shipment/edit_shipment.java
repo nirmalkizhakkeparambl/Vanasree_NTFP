@@ -172,7 +172,7 @@ public class edit_shipment extends AppCompatActivity {
                             vehicleOther.setText(model.getVehicleType());
                         }
 
-//                            vehicle_type.setText(model.getVehicleType());
+
                             vehicle_no.setText(model.getVehicleNo());
                             syncstatus=model.getSynced();
                             if (SnackBarUtils.NetworkSnack(edit_shipment.this)){

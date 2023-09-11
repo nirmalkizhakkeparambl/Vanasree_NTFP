@@ -44,9 +44,9 @@
 
         <ImageView
             android:id="@+id/imageView4"
-            android:layout_width="150dp"
-            android:layout_height="150dp"
-            android:layout_marginStart="50sp"
+            android:layout_width="140dp"
+            android:layout_height="140dp"
+            android:layout_marginStart="15sp"
             android:src="@drawable/kerala_forest_logo"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />

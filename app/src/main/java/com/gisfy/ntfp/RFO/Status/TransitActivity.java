@@ -97,6 +97,7 @@ public class TransitActivity extends AppCompatActivity {
     private final List<String> vssList=new ArrayList<>();
     private ArrayAdapter<String> vssAdapter;
     private NtfpDao dao;
+    private int mmID;
     private MemberModel memberModel = null;
 
     @Override
@@ -212,14 +213,14 @@ public class TransitActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 String getfromdate = fromdate.getText().toString().trim();
-            String getfrom[] = getfromdate.split("-");
-            int year,month,day;
-            year= Integer.parseInt(getfrom[2]);
-            month = Integer.parseInt(getfrom[1]);
-            day = Integer.parseInt(getfrom[0]);
-            final Calendar c = Calendar.getInstance();
-            c.set(year,month,day+1);
-                   DatePickerDialog datePickerDialog = new DatePickerDialog(TransitActivity.this,
+                String getfrom[] = getfromdate.split("-");
+                int year,month,day;
+                year= Integer.parseInt(getfrom[2]);
+                month = Integer.parseInt(getfrom[1]);
+                day = Integer.parseInt(getfrom[0]);
+                final Calendar c = Calendar.getInstance();
+                c.set(year,month,day+1);
+                DatePickerDialog datePickerDialog = new DatePickerDialog(TransitActivity.this,
                         new DatePickerDialog.OnDateSetListener() {
                             @Override
                             public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
@@ -294,7 +295,7 @@ public class TransitActivity extends AppCompatActivity {
                 json.put("FromDate",fromdate);
                 if (!to.getText().toString().equals(""))
                     Log.i("todateCheck293",todate);
-                    json.put("ToDate",todate);
+                json.put("ToDate",todate);
                 if (vssSpinner.getSelectedItemPosition()!=0)
                     json.put("VSS",vssSpinner.getSelectedItem().toString());
                 if (statusSpinner.getSelectedItemPosition()!=0)
@@ -368,8 +369,13 @@ public class TransitActivity extends AppCompatActivity {
         if (position==0){
             List<TransitPassModel> pending=new ArrayList<>();
             for (TransitPassModel model:list){
-                Log.i("MemberIddata361",model.getMemberID()+"");
-                if (!model.getTransitStatus().equals("Accepted")&&!model.getTransitStatus().equals("Rejected")){
+           //     Log.i("MemberIddata361",model.getMemberID()+"");
+//                if(TransitPassModel!= null) {
+//                    mmID = model.getMemberID();
+//                }
+            //    Log.i("MembermmID",mmID+"");
+              if ((model.getTransitStatus()!=null)&&(!model.getTransitStatus().equals("Accepted")&&!model.getTransitStatus().equals("Rejected") )){
+           //     if (model.getTransitStatus().equals(null)){
                     pending.add(model);
                     if (!vssList.contains(model.getvSSName()))
                         vssList.add(model.getvSSName());
@@ -458,9 +464,15 @@ public class TransitActivity extends AppCompatActivity {
                 List<String> row = new ArrayList<>();
                 row.add(ntfpModel.getnTFPName());
                 row.add(ntfpModel.getQuantity()+ntfpModel.getUnit());
-                dao = SynchroniseDatabase.getInstance(TransitActivity.this).ntfpDao();
-                memberModel = dao.getMemberFromMemberId(model.getMemberID());
-                row.add(memberModel.getName());
+//                dao = SynchroniseDatabase.getInstance(TransitActivity.this).ntfpDao();
+//                memberModel = dao.getMemberFromMemberId(model.getMemberID());
+//                if(memberModel.getName().isEmpty() || memberModel.getName().equals(null) ){
+//                    row.add(String.valueOf(ntfpModel.getMemberID()));
+//                }else { row.add(memberModel.getName());}
+                row.add(String.valueOf(model.getMemberID()));
+
+
+
 
                 rows.add(row);
             }

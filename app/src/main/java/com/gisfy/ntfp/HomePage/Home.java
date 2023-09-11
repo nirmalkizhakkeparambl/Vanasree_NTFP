@@ -60,10 +60,12 @@ public class Home extends AppCompatActivity {
     public int backpressCnt=0;
     private DBHelper db;
     private ImageView wishImage;
+    private List<CollectorsModel> memberList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
+
 
         setContentView(R.layout.activity_home);
         initViews();
@@ -161,6 +163,7 @@ public class Home extends AppCompatActivity {
         HashMap<String,String> json=new HashMap<>();
         json.put("DivisionId",user.getDivisionId()+"");
         json.put("RangeId",user.getRangeId()+"");
+
         Call<List<VSSModel>> vss = RetrofitClient.getInstance().getMyApi().getVSS(json);
         vss.enqueue(new Callback<List<VSSModel>>() {
             @Override
@@ -331,6 +334,7 @@ public class Home extends AppCompatActivity {
 
     public void setupMemberData(HashMap<String,String> json){
 
+
         Log.i("Line 2470",json.toString());
         Call<List<CollectorsModel>> call = RetrofitClient.getInstance().getMyApi().getCollectors(json);
         call.enqueue(new Callback<List<CollectorsModel>>() {
@@ -338,20 +342,24 @@ public class Home extends AppCompatActivity {
             public void onResponse(Call<List<CollectorsModel>> call, Response<List<CollectorsModel>> response) {
                 if (response.isSuccessful()&&response.body().get(0).getCid()!=0) {
                     Log.i("Line 2430",response.body().get(0).toString());
-                    List<CollectorsModel> memberList = response.body();
+                    if(memberList!=null) {
+                        memberList.clear();
+                    }
+                    memberList = response.body();
                     SynchroniseDatabase database = SynchroniseDatabase.getInstance(Home.this);
+                  //  database.ntfpDao().getAllMembers().clear();
                     database.ntfpDao().insertAllCollector(memberList);
                     for (CollectorsModel model:memberList){
                         database.ntfpDao().insertAllMembers(model.getMember());
                     }
-                    findViewById(R.id.spin_kit).setVisibility(View.GONE);
+//                    findViewById(R.id.spin_kit).setVisibility(View.GONE);
                 } else {
-                    findViewById(R.id.spin_kit).setVisibility(View.GONE);
+//                    findViewById(R.id.spin_kit).setVisibility(View.GONE);
                 }
             }
             @Override
             public void onFailure(Call<List<CollectorsModel>> call, Throwable t) {
-                findViewById(R.id.spin_kit).setVisibility(View.GONE);
+             //   findViewById(R.id.spin_kit).setVisibility(View.GONE);
             }
         });
     }
@@ -371,8 +379,9 @@ public class Home extends AppCompatActivity {
                         .build();
                 MediaType mediaType = MediaType.parse("application/json");
                 RequestBody body = RequestBody.create(mediaType,strings[0]);
+                Log.i("BODDDDDY374",body+"");
                 Request request = new Request.Builder()
-                        .url("http://13.127.166.242/NTFPAPI/api/NTFPList")
+                        .url("http://vanasree.com/NTFPAPI/api/NTFPList")
                         .method("POST", body)
                         .addHeader("Content-Type", "application/json")
                         .build();

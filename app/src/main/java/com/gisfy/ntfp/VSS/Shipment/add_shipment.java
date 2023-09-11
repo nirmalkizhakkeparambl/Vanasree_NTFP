@@ -99,7 +99,7 @@ vehicle_type.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() 
     @Override
     public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
 
-        if (i==6){
+        if (i==8){
             otherlayout.setVisibility(View.VISIBLE);
         }else {
             otherlayout.setVisibility(View.GONE);
@@ -171,9 +171,9 @@ vehicle_type.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() 
         List<KeyPairBoolData> keyPairList=new ArrayList<>();
         try {
             KeyPairBoolData tempKey = new KeyPairBoolData();
-            tempKey.setSelected(false);
-            tempKey.setName("Select Transit");
-            keyPairList.add(tempKey);
+//            tempKey.setSelected(false);
+//            tempKey.setName("Select Transit");
+            keyPairList.remove(tempKey);
             for (String transit : transits) {
                 if (transit!=null) {
                     KeyPairBoolData key = new KeyPairBoolData();

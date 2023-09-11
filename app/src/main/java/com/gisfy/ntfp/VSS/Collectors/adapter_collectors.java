@@ -53,8 +53,8 @@ public class adapter_collectors  extends RecyclerView.Adapter<adapter_collectors
         final Collector data = list.get(position);
 
         holder.downloadLayout.setVisibility(View.GONE);
-        Log.i("dataSynced56",data.getSynced()+"");
-        if (data.getSynced()==1)
+//        Log.i("dataSynced56",data.getSynced()+"");
+        if (data.getSynced() == 1)
             holder.cloud.setImageResource(R.drawable.vector_cloud_on);
         else
             holder.cloud.setImageResource(R.drawable.vector_notsynced);
@@ -166,20 +166,29 @@ public class adapter_collectors  extends RecyclerView.Adapter<adapter_collectors
     }
 
     public List<Collector> getSelectedItems() {
-        List<Collector> tempList=new ArrayList<>();
+        List<Collector> tempList = new ArrayList<>();
         for(Collector model:list){
             if(model.isSelected())
                 tempList.add(model);
+
         }
         return tempList;
     }
     @Override
-    public int getItemCount() {
-        return list.size();
+    public int getItemCount()
+
+    {
+//        Log.i("dataLISTTSIZE",list.size()+"");
+        int d = 0;
+        try {
+          d = list.size();
+        }catch (Exception e){
+        }
+     return d;
     }
 
 
-    public static class ViewHolder extends RecyclerView.ViewHolder {
+    public class ViewHolder extends RecyclerView.ViewHolder {
         TextView title, subtitle;
         CheckBox checkBox;
         CardView cardView;

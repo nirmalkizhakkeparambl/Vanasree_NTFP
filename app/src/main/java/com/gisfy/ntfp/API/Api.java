@@ -36,7 +36,7 @@ import retrofit2.http.POST;
 
 public interface Api {
 
-    String BASE_URL = "http://13.127.166.242/NTFPAPI/API/";
+    String BASE_URL = "https://vanasree.com/NTFPAPI/API/";
 
     @POST("VSS")
     @Headers({ "Content-Type: application/json;charset=UTF-8"})
@@ -46,7 +46,8 @@ public interface Api {
     @Headers({ "Content-Type: application/json;charset=UTF-8"})
     Call<List<VSSUser>> vssforgotpass(@Body HashMap<String, String> fields);
 
-    
+    @POST("VSSList")
+    Call<List<VSSUser>> getAllVss();
 
     @POST("ForgotPassword")
     @Headers({ "Content-Type: application/json;charset=UTF-8"})

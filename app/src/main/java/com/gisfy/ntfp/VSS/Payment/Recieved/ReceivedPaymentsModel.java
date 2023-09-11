@@ -4,9 +4,9 @@ import com.google.gson.annotations.SerializedName;
 
 public class ReceivedPaymentsModel {
 
-    @SerializedName("ShipmentNumber")
+    @SerializedName("ShipmentId")
     private String shipmentNumber;
-    @SerializedName("purchaseordernumber")
+    @SerializedName("PurchaseOrderNumber")
     private String purchaseordernumber;
     @SerializedName("pcpoid")
     private int pcpoid;
@@ -30,7 +30,7 @@ public class ReceivedPaymentsModel {
     private String iFSCcode;
     @SerializedName("DFOName")
     private String dFOName;
-    @SerializedName("Amount")
+    @SerializedName("TotalCost")
     private String amount;
     @SerializedName("ToVSS")
     private String toVSS;

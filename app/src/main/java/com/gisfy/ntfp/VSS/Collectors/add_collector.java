@@ -9,6 +9,7 @@ import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.Editable;
+import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
@@ -16,6 +17,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.DatePicker;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.MultiAutoCompleteTextView;
@@ -66,7 +68,7 @@ import okhttp3.RequestBody;
 public class add_collector extends AppCompatActivity {
     private Spinner category, gender, idtype,addfamilySpinner,education;
     private MultiSpinnerSearch product;
-    private TextInputEditText village, vss, division, range, collector_name, collector_spouse, age, aadhar,  family, bankname, info, accountno, ifsc;
+    private TextInputEditText village, vss, division, range, collector_name, collector_spouse, age, aadhar, family, bankname, info, accountno, ifsc;
     private TextInputEditText username, password, date;
     private StaticChecks check;
     private SharedPref pref;
@@ -278,14 +280,32 @@ public class add_collector extends AppCompatActivity {
             }
         });
     }
+    private boolean validateEditText(EditText editText){
+        String text = editText.getText().toString();
+        if(text.startsWith(" ")){
+            editText.setError("This Field is required");
+            Toast.makeText(this,"Please fill "+editText.getHint(),Toast.LENGTH_SHORT).show();
+
+            return false;
+        }
+        return true;
+    }
 
     private Collector  validateData() {
         Collector model = null;
 
-        if (check.checkETList(new TextInputEditText[]{village, vss, division, range, collector_name, collector_spouse}))
-            if (check.checkSpinnerList(new Spinner[]{category}))
+       if (validateEditText(village))
+           if (validateEditText(vss))
+               if (validateEditText(division))
+                   if (validateEditText(range))
+                       if (validateEditText(collector_name))
+                      //
+
+   //   if (check.checkETList(new TextInputEditText[]{village, vss, division, range, collector_name, collector_spouse}))
+            if (check.checkSpinnerList(new Spinner[]{category,education}))
+
                 if (check.checkETList(new TextInputEditText[]{date, age}))
-                    if (check.checkSpinnerList(new Spinner[]{gender,idtype,education}))
+                    if (check.checkSpinnerList(new Spinner[]{gender,idtype}))
                         if (check.checkETList(new TextInputEditText[]{aadhar, family}))
                 if (product.getSelectedItems().size() > 0) {
                     Log.i("Collectorid",projectId);
@@ -321,7 +341,6 @@ public class add_collector extends AppCompatActivity {
 
 
 
-
     private class NTFPTask extends AsyncTask<String, String, String> {
 
         @Override
@@ -343,7 +362,7 @@ public class add_collector extends AppCompatActivity {
                 MediaType mediaType = MediaType.parse("application/json");
                 RequestBody body = RequestBody.create(mediaType, json.toString());
                 Request request = new Request.Builder()
-                        .url("http://13.127.166.242/NTFPAPI/API/NTFPList")
+                        .url("http://vanasree.com/NTFPAPI/API/NTFPList")
                         .method("POST", body)
                         .addHeader("Content-Type", "application/json")
                         .build();

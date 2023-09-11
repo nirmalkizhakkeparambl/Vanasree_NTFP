@@ -76,7 +76,7 @@ public class Profile extends AppCompatActivity  {
                 list.add(new ProfileModel(getString(R.string.phoneno), vssUser.getHeadPhoneNumber(), R.drawable.vector_email));
                 list.add(new ProfileModel(getString(R.string.range), vssUser.getRangeName(), R.drawable.vector_email));
                 list.add(new ProfileModel(getString(R.string.vsshead), vssUser.getVssHead(), R.drawable.vector_email));
-                list.add(new ProfileModel(getString(R.string.vssname), vssUser.getvSSName(), R.drawable.vector_email));
+                list.add(new ProfileModel("VSS Name", vssUser.getvSSName(), R.drawable.vector_email));
                 break;
             case Constants.COLLECTORS:
                 CollectorUser user = pref.getCollector();
@@ -85,8 +85,8 @@ public class Profile extends AppCompatActivity  {
                 list.add(new ProfileModel(getString(R.string.division), user.getDivision(), R.drawable.vector_email));
                 list.add(new ProfileModel(getString(R.string.range), user.getRange(), R.drawable.vector_email));
                 list.add(new ProfileModel(getString(R.string.vssrole), user.getvSSName(), R.drawable.vector_email));
-                list.add(new ProfileModel(getString(R.string.spoucename), user.getSpouseName(), R.drawable.vector_email));
-                list.add(new ProfileModel(getString(R.string.collectorname), user.getCollectorName(), R.drawable.vector_email));
+                list.add(new ProfileModel(getString(R.string.spoucenamep), user.getSpouseName(), R.drawable.vector_email));
+                list.add(new ProfileModel(getString(R.string.collectornamep), user.getCollectorName(), R.drawable.vector_email));
                 break;
         }
         ProfileAdapter adapter=new ProfileAdapter( Profile.this,list);
@@ -99,6 +99,15 @@ public class Profile extends AppCompatActivity  {
 
                 AlertDialog.Builder builder = new AlertDialog.Builder(Profile.this);
                 builder.setTitle(R.string.Are_you_sure_do_you_want_to_Logout)
+                        .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                Intent intent = new Intent(getApplicationContext(),Profile.class);
+                                startActivity(intent);
+                                finish();
+
+                            }
+                        })
                         .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {

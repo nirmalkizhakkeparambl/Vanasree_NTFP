@@ -25,6 +25,7 @@ import com.gisfy.ntfp.SqliteHelper.SynchroniseDatabase;
 import com.gisfy.ntfp.Utils.Constants;
 import com.gisfy.ntfp.Utils.SharedPref;
 import com.gisfy.ntfp.Utils.StaticChecks;
+import com.gisfy.ntfp.VSS.RequestForm.StocksModel;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -41,10 +42,14 @@ public class adapter_inventory  extends RecyclerView.Adapter<adapter_inventory.V
     public final List<InventoryRelation> list;
     private final DBHelper db;
     private NtfpDao dao;
+    String CCCC;
+
     public adapter_inventory(List<InventoryRelation> list, list_inventory activity) {
         this.list = list;
         this.activity = activity;
         db=new DBHelper(activity);
+
+
     }
 
     @NonNull
@@ -55,7 +60,7 @@ public class adapter_inventory  extends RecyclerView.Adapter<adapter_inventory.V
     }
 
     @Override
-    public void onBindViewHolder(@NonNull final ViewHolder holder,final int position) {
+    public void onBindViewHolder(@NonNull final ViewHolder holder, final int position) {
         final InventoryRelation data = list.get(position);
 
         Log.i("Sysnced 53",data.getInventory().isSynced()+"");
@@ -67,7 +72,15 @@ public class adapter_inventory  extends RecyclerView.Adapter<adapter_inventory.V
         }
         holder.downloadLayout.setVisibility(View.GONE);
 
-        String subtitle= "Quantity= "+data.getInventory().getQuantity()+" "+data.getInventory().getMeasurements()+" by "+data.getCollector();
+        String dateget =data.getInventory().getDate();
+        String[] dateParts = dateget.split("-");
+        String year = dateParts[0];
+        String month = dateParts[1];
+        String day = dateParts[2];
+
+        String datanew = day+"-"+ month+"-"+year;
+
+        String subtitle= "Quantity ="+"  "+data.getInventory().getQuantity()+" "+data.getInventory().getMeasurements()+" by "+data.getCollector()+" Date "+ datanew;
         holder.subtitle.setText(subtitle);
         holder.title.setTypeface(Typeface.defaultFromStyle(Typeface.ITALIC));
         if (data.getNtfp()!=null){
@@ -107,6 +120,7 @@ public class adapter_inventory  extends RecyclerView.Adapter<adapter_inventory.V
     }
 
     private void showDailog(int position,InventoryRelation model){
+        final InventoryRelation data = list.get(position);
         HorizontalScrollView scrollView = new HorizontalScrollView(activity);
         TableLayout tableLayout=new TableLayout(activity);
         tableLayout.setStretchAllColumns(true);
@@ -127,8 +141,17 @@ public class adapter_inventory  extends RecyclerView.Adapter<adapter_inventory.V
             }
         }
 
+        String dateget =model.getInventory().getDate();
+        String[] dateParts = dateget.split("-");
+        String year = dateParts[0];
+        String month = dateParts[1];
+        String day = dateParts[2];
 
-        List<List<String>> lists= Collections.singletonList(Arrays.asList( model.getCollector().getCollectorName(), ntfpName, model.getInventory().getQuantity()+model.getInventory().getMeasurements()));
+
+
+        String datanew = day+"-"+ month+"-"+year;
+
+        List<List<String>> lists= Collections.singletonList(Arrays.asList(model.getInventory().getColectname()+"", ntfpName, model.getInventory().getQuantity()+" "+model.getInventory().getMeasurements()));
         new StaticChecks(activity).setTableLayout(tableLayout,titles,lists);
 
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
@@ -175,10 +198,6 @@ public class adapter_inventory  extends RecyclerView.Adapter<adapter_inventory.V
 
                         AlertDialog alert11 = builder1.create();
                         alert11.show();
-
-
-
-
                     }
                 });
         AlertDialog alertDialog = alertDialogBuilder.create();
@@ -186,7 +205,6 @@ public class adapter_inventory  extends RecyclerView.Adapter<adapter_inventory.V
         alertDialog.show();
 
     }
-
     public List<InventoryRelation> getSelectedItems() {
         List<InventoryRelation> tempList=new ArrayList<>();
         for(InventoryRelation model:list){
@@ -195,6 +213,14 @@ public class adapter_inventory  extends RecyclerView.Adapter<adapter_inventory.V
         }
         return tempList;
     }
+//    public List<Inventory> getSelectedItems() {
+//        List<Inventory> tempList1=new ArrayList<>();
+//        for(Inventory model:list){
+//            if(model.isSelected())
+//                tempList1.add(model);
+//        }
+//        return tempList1;
+//    }
     @Override
     public int getItemCount() {
         return list.size();
@@ -215,7 +241,9 @@ public class adapter_inventory  extends RecyclerView.Adapter<adapter_inventory.V
         CardView cardView;
         ImageView cloud,download;
         LinearLayout downloadLayout;
+
         public ViewHolder(@NonNull View itemView) {
+
             super(itemView);
             title = itemView.findViewById(R.id.title);
             subtitle = itemView.findViewById(R.id.subtitle);

@@ -21,8 +21,11 @@ public class CollectorStockModel implements Serializable {
     private int nTFPTypeId;
     @SerializedName("Quantity")
     private String quantity;
+    @SerializedName("LoseAmound")
+    private String loseAmound;
     @SerializedName("CollectorID")
     private int collectorID;
+
     @SerializedName("CollectorName")
     private String collectorName;
     @SerializedName("DateTime")
@@ -55,6 +58,14 @@ public class CollectorStockModel implements Serializable {
     }
 
     private boolean isSelected;
+
+    public String getLoseAmound() {
+        return loseAmound;
+    }
+
+    public void setLoseAmound(String loseAmound) {
+        this.loseAmound = loseAmound;
+    }
 
     public int getMemberId() {
         return memberId;

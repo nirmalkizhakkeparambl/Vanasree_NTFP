@@ -64,7 +64,8 @@ public class Ticket_UI extends AppCompatActivity {
             spouse.setText("Expired");
         }
         userName.setText(pref.getString("userId"));
-        name.setText(user.getCollectorName());
+//        name.setText(user.getCollectorName());
+        name.setText(user.getUserName());
         vssname.setText(user.getvSSName());
 
         division.setText(user.getDivision());

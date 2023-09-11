@@ -35,7 +35,7 @@ public class InventoryRelation {
         return selected;
     }
 
-    public void setSelected(boolean selected) {
+    public void setSelected(boolean selected){
         this.selected = selected;
     }
 

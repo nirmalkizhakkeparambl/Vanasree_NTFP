@@ -113,12 +113,12 @@ public class adapter_request_list  extends RecyclerView.Adapter<adapter_request_
         holder.longPresslayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String[] titles = activity.getResources().getStringArray(R.array.transit_titles);
+                String[] titles = activity.getResources().getStringArray(R.array.transit_titles3);
                 List<List<String>> rows = new ArrayList<>();
                 for (TransitNTFPModel model:data.getnTFP()){
                     List<String> row = new ArrayList<>();
                     row.add(model.getnTFPmalayalamname()+"("+model.getnTFPName().split("-")[0]+")");
-                    row.add(model.getQuantity()+model.getUnit());
+                    row.add(model.getQuantity()+" "+model.getUnit());
                     dao = SynchroniseDatabase.getInstance(v.getContext()).ntfpDao();
                     memberModel = dao.getMemberFromMemberId(data.getMemberID());
                     try {
@@ -156,7 +156,7 @@ public class adapter_request_list  extends RecyclerView.Adapter<adapter_request_
                 if (permissionUtils.checkPermission(activity, 1, view)) {
                      try {
                          Log.i("datagetTransUniqueId",data.getTransUniqueId()+"");
-                         activity.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("http://13.127.166.242/NTFPIMS/VSSTransitPass.aspx?TransUniqueId="+data.getTransUniqueId())));
+                         activity.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("http://vanasree.com/NTFPIMS/VSSTransitPass.aspx?TransUniqueId="+data.getTransUniqueId())));
                      } catch (Exception e) {
                          e.getStackTrace();
                      }

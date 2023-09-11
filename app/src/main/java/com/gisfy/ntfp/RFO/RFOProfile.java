@@ -100,5 +100,5 @@ public class RFOProfile extends AppCompatActivity {
         pref=new SharedPref(this);
         recyclerView=findViewById(R.id.profile_recycle_rfo);
         type=pref.getString("type");
-      }
+    }
 }

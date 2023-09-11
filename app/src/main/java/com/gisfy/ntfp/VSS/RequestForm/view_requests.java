@@ -189,7 +189,7 @@ public class view_requests extends AppCompatActivity {
 
 
         ArrayAdapter<String> statusadap = new ArrayAdapter<String>(view_requests.this,
-                android.R.layout.simple_spinner_dropdown_item,getResources().getStringArray(R.array.status_spinner_accepted));
+        android.R.layout.simple_spinner_dropdown_item,getResources().getStringArray(R.array.status_spinner_accepted));
         statusSpinner.setAdapter(statusadap);
         setDate(view_requests.this,from);
         setDate(view_requests.this,to);
@@ -199,17 +199,16 @@ public class view_requests extends AppCompatActivity {
             public void onClick(View view) {
                 VSSUser user=pref.getVSS();
                 final HashMap<String,String> json=new HashMap<>();
-                json.put("Division",user.getDivisionId()+"");
-                json.put("Range", user.getRangeId()+"");
-                json.put("VSS",user.getVid()+"");
-
+                json.put("DivisionId",user.getDivisionId()+"");
+                json.put("RangeId", user.getRangeId()+"");
+                json.put("VSSId",user.getVid()+"");
                 if (from.getText().length()>0)
                     json.put("FromDate",from.getText().toString());
                 if (to.getText().length()>0)
                     json.put("ToDate",to.getText().toString());
                 if (statusSpinner.getSelectedItemPosition()!=0)
                     json.put("TransitStatus",statusSpinner.getSelectedItem().toString());
-                Log.i("json",json.toString());
+                Log.i("json212",json.toString());
                 getData(json);
                 slide();
             }
@@ -248,6 +247,7 @@ public class view_requests extends AppCompatActivity {
             @Override
             public void onResponse(Call<List<TransitPassModel>> call, Response<List<TransitPassModel>> response) {
                 if (response.isSuccessful()){
+                    Log.i("LogResponce",list.size()+"");
                     list=response.body();
                     try {
                         updateTab(tabLayout.getSelectedTabPosition());
@@ -263,13 +263,19 @@ public class view_requests extends AppCompatActivity {
             @Override
             public void onFailure(Call<List<TransitPassModel>> call, Throwable t) {
 
-                SnackBarUtils.ErrorSnack(view_requests.this,getString(R.string.servernotresponding));
+                SnackBarUtils.ErrorSnack(view_requests.this,getString(R.string.nodata));
             }
         });
     }
     private void updateTab(int position){
         bottomSheet.setVisibility(View.GONE);
         if (position==0){
+            findViewById(R.id.title_List).setVisibility(View.GONE);
+            findViewById(R.id.titletv).setVisibility(View.GONE);
+            findViewById(R.id.statustv).setVisibility(View.GONE);
+            findViewById(R.id.statusSpinner).setVisibility(View.GONE);
+
+
             List<TransitPassModel> pending=new ArrayList<>();
             for (TransitPassModel model:list){
                 if (!model.getTransitStatus().equals("Accepted")&&!model.getTransitStatus().equals("Rejected")){
@@ -279,6 +285,10 @@ public class view_requests extends AppCompatActivity {
             adapter.updateData(pending);
         }else{
             List<TransitPassModel> other=new ArrayList<>();
+            findViewById(R.id.title_List).setVisibility(View.GONE);
+            findViewById(R.id.titletv).setVisibility(View.GONE);
+            findViewById(R.id.statustv).setVisibility(View.VISIBLE);
+            findViewById(R.id.statusSpinner).setVisibility(View.VISIBLE);
             for (TransitPassModel model:list){
                 if (model.getTransitStatus().equals("Accepted")||model.getTransitStatus().equals("Rejected")){
                     other.add(model);

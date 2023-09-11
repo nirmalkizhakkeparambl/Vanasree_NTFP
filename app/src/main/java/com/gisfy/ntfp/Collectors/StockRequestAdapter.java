@@ -58,16 +58,20 @@ public class StockRequestAdapter  extends RecyclerView.Adapter<StockRequestAdapt
     @Override
     public void onBindViewHolder(@NonNull final StockRequestAdapter.ViewHolder holder, final int position) {
         final CollectorStockModel data = list.get(position);
-        Log.i("checkbox",data.getnTFP()+"-"+data.getmName()+"-null");
+        Log.i("checkbox",data.getnTFP()+"-"+data.getmName()+"-null"+data.getvSSStatus()+" -");
         if (data.getRequestStatus().equals("true")){
             holder.checkBox.setVisibility(View.GONE);
             holder.cloud.setVisibility(View.VISIBLE);
-            if (data.getvSSStatus().equals("true"))
-                holder.cloud.setImageResource(R.drawable.vector_check_green);
-            else if(data.getvSSStatus().equals("false"))
-                holder.cloud.setImageResource(R.drawable.vector_clear_red);
-            else
+            if (data.getRequestStatus()!="") {
+                if (data.getvSSStatus().equals("true"))
+                    holder.cloud.setImageResource(R.drawable.vector_check_green);
+                else if (data.getvSSStatus().equals("false"))
+                    holder.cloud.setImageResource(R.drawable.vector_clear_red);
+                else
+                    holder.cloud.setImageResource(R.drawable.vector_time);
+            }else {
                 holder.cloud.setImageResource(R.drawable.vector_time);
+            }
         }else{
             holder.checkBox.setVisibility(View.VISIBLE);
             holder.cloud.setVisibility(View.GONE);
@@ -75,7 +79,7 @@ public class StockRequestAdapter  extends RecyclerView.Adapter<StockRequestAdapt
 
         holder.title1.setText(data.getnTFP());
         holder.title2.setText(data.getDateTime());
-        holder.title3.setText(activity.getString(R.string.totalstock)+data.getQuantity());
+        holder.title3.setText(activity.getString(R.string.totalstock)+data.getQuantity()+ " " +data.getUnit());
         holder.more.setVisibility(View.GONE);
         holder.longPresslayout.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -86,6 +90,7 @@ public class StockRequestAdapter  extends RecyclerView.Adapter<StockRequestAdapt
         holder.checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+
                 Log.i("ischecked",isChecked+"");
                 list.get(position).setSelected(isChecked);
             }

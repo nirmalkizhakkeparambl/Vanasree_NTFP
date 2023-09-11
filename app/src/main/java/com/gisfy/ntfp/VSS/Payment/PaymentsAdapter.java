@@ -65,7 +65,7 @@ public class PaymentsAdapter extends RecyclerView.Adapter<PaymentsAdapter.ViewHo
             holder.title.setText(title);
             holder.downloadimage.setVisibility(View.GONE);
             holder.title.setTypeface(Typeface.defaultFromStyle(Typeface.ITALIC));
-            String subtitle = context.getString(R.string.amountof)+data.getAmount()+context.getString(R.string.quantityfor)+data.getQuantity()+data.getMeasurement()+context.getString(R.string.tofor)+data.getCollector();
+            String subtitle = context.getString(R.string.amountof)+data.getAmount()+context.getString(R.string.quantityfor)+data.getQuantity()+data.getMeasurement();
             holder.subtitle.setText(subtitle);
             if (data.getSynced()==1)
                 holder.cloud.setImageResource(R.drawable.vector_cloud_on);
@@ -156,8 +156,8 @@ public class PaymentsAdapter extends RecyclerView.Adapter<PaymentsAdapter.ViewHo
         tableLayout.removeAllViews();
         scrollView.addView(tableLayout);
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(context);
-        String[] titles=new String[]{"Collector","NTFP","Quantity","Amount"};
-        List<List<String>> lists= Collections.singletonList(Arrays.asList(model.getCollector(), model.getProduct(), model.getQuantity()+model.getMeasurement(), model.getAmount()));
+        String[] titles=new String[]{"ID","NTFP","Quantity","Amount"};
+        List<List<String>> lists= Collections.singletonList(Arrays.asList(model.getUid(), model.getProduct(), model.getQuantity()+model.getMeasurement(), model.getAmount()));
         new StaticChecks(context).setTableLayout(tableLayout,titles,lists);
         alertDialogBuilder
                 .setMessage(context.getString(R.string.paymentdetails))

@@ -5,22 +5,32 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.FileUtils;
+import android.os.StrictMode;
+import android.provider.OpenableColumns;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.gisfy.ntfp.ExcelImport.ExcelUtil;
+import com.gisfy.ntfp.HomePage.Home;
 import com.gisfy.ntfp.R;
 import com.gisfy.ntfp.SqliteHelper.DBHelper;
 import com.gisfy.ntfp.Utils.RealPathUtil;
 import com.gisfy.ntfp.Utils.SnackBarUtils;
 import com.gisfy.ntfp.Utils.StaticChecks;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -29,11 +39,19 @@ import java.util.UUID;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
+
 public class ImportExcel extends AppCompatActivity {
     public static final String TAG = "ImportExcelTag";
     private Context mContext;
     private final int FILE_SELECTOR_CODE = 10000;
     private final List<Map<Integer, Object>> readExcelList = new ArrayList<>();
+    String excelPath="";
 
     private ImageView retake;
     private TextView uploadtv;
@@ -42,6 +60,8 @@ public class ImportExcel extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_import_excel);
+        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+        StrictMode.setThreadPolicy(policy);
         mContext = this;
 
         initViews();
@@ -115,147 +135,92 @@ public class ImportExcel extends AppCompatActivity {
             if (uri == null) return;
             Log.i(TAG, "onActivityResult: " + "filePath：" + uri.getPath());
             uploadtv.setText(getResources().getText(R.string.uploadagain));
-            importExcelDeal(uri);
+
+            excelPath=uri.getPath();
+            DoActualReqst(uri);
 
         }
     }
 
-    private void importExcelDeal(final Uri uri) {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                Log.i(TAG, "doInBackground: Importing...");
-                ImportExcel.this.runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        findViewById(R.id.spin_kit).setVisibility(View.VISIBLE);
-                        SnackBarUtils.SuccessSnack(ImportExcel.this,getString(R.string.importing));
+
+    public void DoActualReqst(Uri uri){
+        try {
+            File file = new File(getRealPathFromURI(uri));
+            String fileName = file.getName();
+            OkHttpClient client = new OkHttpClient();
+            String url = "http://vanasree.com/NTFPAPI/API/ReadExcel";
+            RequestBody body = new MultipartBody.Builder()
+                    .setType(MultipartBody.FORM)
+                    .addFormDataPart("InputFile", file.getName(), RequestBody.create(MediaType.parse("application/vnd.ms-excel"), file))
+                    .build();
+            Log.d("OKKKRespoveBody", body+ "");
+            Request request = new Request.Builder()
+                    .url(url)
+                    .post(body)
+                    .build();
+
+            Thread thread = new Thread(() -> {
+                try  {
+                    try {
+                        Response response = client.newCall(request).execute();
+                        String res = response.body().string();
+                        Log.i("OKKKLogResponce",  ""+res);
+                        if (res.contains("success")) {
+                            runOnUiThread(() -> {
+                                Toast.makeText(mContext, "Upload Successfull", Toast.LENGTH_SHORT).show();
+                                Intent i = new Intent(ImportExcel.this, Home.class);
+                                startActivity(i);
+                            });
+                        }
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                        Toast.makeText(mContext, "Something Wrong", Toast.LENGTH_SHORT).show();
                     }
-                });
-
-                final List<Map<Integer, Object>> readExcelNew = ExcelUtil.readExcelNew(mContext, uri, RealPathUtil.getRealPath(ImportExcel.this,uri));
-
-                Log.i(TAG, "onActivityResult:readExcelNew " + ((readExcelNew != null) ? readExcelNew.size() : ""));
-
-                if (readExcelNew != null && readExcelNew.size() > 0) {
-                    readExcelList.clear();
-                    readExcelList.addAll(readExcelNew);
-                    Log.i(TAG, "run: successfully imported");
-                    ImportExcel.this.runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            findViewById(R.id.spin_kit).setVisibility(View.GONE);
-                            new addtoDB(readExcelNew).execute();
-                            SnackBarUtils.SuccessSnack(ImportExcel.this,getString(R.string.importsuccess));
-                        }
-                    });
-                } else {
-                    ImportExcel.this.runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            findViewById(R.id.spin_kit).setVisibility(View.GONE);
-                            SnackBarUtils.ErrorSnack(ImportExcel.this,getString(R.string.excelerror));
-                        }
-                    });
-                }
-            }
-        }).start();
-    }
-
-
-    private class addtoDB extends AsyncTask<String,String,String>{
-
-        List<Map<Integer, Object>> readExcelNew;
-        private addtoDB(List<Map<Integer, Object>> readExcelNew ){
-            this.readExcelNew=readExcelNew;
-        }
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            findViewById(R.id.spin_kit).setVisibility(View.VISIBLE);
-        }
-
-        @Override
-        protected String doInBackground(String... strings) {
-            for (Map<Integer, Object> map: readExcelNew ){
-                String name="",village="",div="",range="",vss="",spouse="",cat="",age="",dob="",idcard="",idnum="",
-                edu="",familycnt="",accnum="",bank="",ifsc="",remarks="";
-                for (int i=0;i<18;i++){
-                    if (map.get(i)!=null) {
-                        switch (i) {
-                            case 0:
-                                name = map.get(i).toString();
-                                break;
-                            case 1:
-                                village = map.get(i).toString();
-                                break;
-                            case 2:
-                                div = map.get(i).toString();
-                                break;
-                            case 3:
-                                range = map.get(i).toString();
-                                break;
-                            case 4:
-                                vss = map.get(i).toString();
-                                break;
-                            case 5:
-                                spouse = map.get(i).toString();
-                                break;
-                            case 6:
-                                cat = map.get(i).toString();
-                                break;
-                            case 7:
-                                age = map.get(i).toString();
-                                break;
-                            case 8:
-                                dob = map.get(i).toString();
-                                break;
-                            case 9:
-                                idcard = map.get(i).toString();
-                                break;
-                            case 10:
-                                idnum = map.get(i).toString();
-                                break;
-                            case 11:
-                                edu = map.get(i).toString();
-                                break;
-                            case 12:
-                                familycnt = map.get(i).toString();
-                                break;
-                            case 13:
-                                accnum = map.get(i).toString();
-                                break;
-                            case 14:
-                                bank = map.get(i).toString();
-                                break;
-                            case 15:
-                                ifsc = map.get(i).toString();
-                                break;
-                            case 16:
-                                remarks = map.get(i).toString();
-                                break;
-                        }
-                    }
-                }
-                UUID uuid=UUID.randomUUID();
-                String usernamestr;
-                try {
-                    usernamestr=div.substring(0,3).toUpperCase()+"-"+range.substring(0,3).toUpperCase()+"-"+vss.substring(0,3).toUpperCase()+"-"+uuid.toString().substring(0,3).toUpperCase();
-                    Collector model=new Collector(uuid.toString(),vss,div,range,village,name,spouse,cat,age,"",dob,idcard,idnum,"",edu,
-                            familycnt,bank,accnum,ifsc,usernamestr,"pass@123",remarks,0);
-                    DBHelper db=new DBHelper(ImportExcel.this);
-                    db.insertData(model);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-            }
-            return null;
-        }
+            });
 
-        @Override
-        protected void onPostExecute(String s) {
-            super.onPostExecute(s);
-            findViewById(R.id.spin_kit).setVisibility(View.GONE);
+            thread.start();
+
+        }catch (Exception e){
+            String exc = e.getLocalizedMessage();
+            Toast.makeText(this,exc, Toast.LENGTH_SHORT).show();
+
+
         }
     }
+
+
+    public String getRealPathFromURI(Uri uri) {
+        Uri returnUri = uri;
+        Cursor returnCursor = getContentResolver().query(returnUri, null, null, null, null);
+
+        int nameIndex = returnCursor.getColumnIndex(OpenableColumns.DISPLAY_NAME);
+        int sizeIndex = returnCursor.getColumnIndex(OpenableColumns.SIZE);
+        returnCursor.moveToFirst();
+        String name = (returnCursor.getString(nameIndex));
+        String size = (Long.toString(returnCursor.getLong(sizeIndex)));
+        File file = new File(getFilesDir(), name);
+        try {
+            InputStream inputStream = getContentResolver().openInputStream(uri);
+            FileOutputStream outputStream = new FileOutputStream(file);
+            int read = 0;
+            int maxBufferSize = 1 * 1024 * 1024;
+            int bytesAvailable = inputStream.available();
+
+            int bufferSize = Math.min(bytesAvailable, maxBufferSize);
+
+            final byte[] buffers = new byte[bufferSize];
+            while ((read = inputStream.read(buffers)) != -1) {
+                outputStream.write(buffers, 0, read);
+            }
+            inputStream.close();
+            outputStream.close();
+        } catch (Exception e) {
+            Log.e("Exception", e.getMessage());
+        }
+        return file.getPath();
+    }
+
 }

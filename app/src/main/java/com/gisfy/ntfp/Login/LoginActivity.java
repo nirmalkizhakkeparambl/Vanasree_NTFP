@@ -240,7 +240,7 @@ public class LoginActivity extends AppCompatActivity {
         json.put("DivisionId", String.valueOf(user.getDivisionId()));
         json.put("RangeId", String.valueOf(user.getRangeId()));
         json.put("VSSId", String.valueOf(user.getvSSId()));
-        Log.i("Line 2470",json.toString());
+        Log.i("Line243membersdata",json.toString());
         Call<List<CollectorsModel>> call = RetrofitClient.getInstance().getMyApi().getCollectors(json);
         call.enqueue(new Callback<List<CollectorsModel>>() {
             @Override

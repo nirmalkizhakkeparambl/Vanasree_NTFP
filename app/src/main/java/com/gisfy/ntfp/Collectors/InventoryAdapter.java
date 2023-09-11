@@ -18,8 +18,10 @@ import android.widget.TextView;
 
 import com.gisfy.ntfp.R;
 import com.gisfy.ntfp.SqliteHelper.DBHelper;
+import com.gisfy.ntfp.SqliteHelper.Entity.InventoryEntity;
 import com.gisfy.ntfp.SqliteHelper.Entity.InventoryRelation;
 import com.gisfy.ntfp.SqliteHelper.Entity.MemberModel;
+import com.gisfy.ntfp.SqliteHelper.NtfpDao;
 import com.gisfy.ntfp.SqliteHelper.SynchroniseDatabase;
 import com.gisfy.ntfp.Utils.StaticChecks;
 import com.gisfy.ntfp.VSS.Collectors.Collector;
@@ -52,6 +54,8 @@ public class InventoryAdapter  extends RecyclerView.Adapter<InventoryAdapter.Vie
     InventoryList activity;
     public final List<InventoryRelation> list;
     private final DBHelper db;
+    private NtfpDao dao;
+    private String inventoryId="";
     public InventoryAdapter(List<InventoryRelation> list, InventoryList activity) {
         this.list = list;
         this.activity = activity;
@@ -75,7 +79,7 @@ public class InventoryAdapter  extends RecyclerView.Adapter<InventoryAdapter.Vie
         else
             holder.cloud.setImageResource(R.drawable.vector_notsynced);
 
-        holder.subtitle.setText(data.getInventory().getDate());
+            holder.subtitle.setText(data.getInventory().getDate());
 
 //        holder.title.setText(data.getNtfp()!=null?data.getNtfp().getNTFPmalayalamname():"");
         if (data.getNtfp()!=null){
@@ -127,39 +131,42 @@ public class InventoryAdapter  extends RecyclerView.Adapter<InventoryAdapter.Vie
         tableLayout.setStretchAllColumns(true);
         tableLayout.removeAllViews();
         scrollView.addView(tableLayout);
+        String ntfpName = "";
+        String memberName ="";
 
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
                 activity);
-        String[] titles=new String[]{"NTFP","Type","Quantity","Member Name"};
+        String[] titles=new String[]{"Collector","Type","Quantity","Member Name"};
 
-        String memberName;
-        if (model.getMember()!=null) memberName = model.getMember().getName();
+
+        if (model.getMember()!=null) {memberName = model.getMember().getName();}
         else memberName = "";
-        List<List<String>> lists= Collections.singletonList(Arrays.asList(model.getNtfp().getNTFPscientificname(), model.getItemType().getMycase(), model.getInventory().getQuantity()+model.getInventory().getMeasurements(),memberName));
+  //   List<List<String>> lists= Collections.singletonList(Arrays.asList(model.getNtfp().getNTFPscientificname(), model.getItemType().getMycase(), model.getInventory().getQuantity()+model.getInventory().getMeasurements(),memberName));
+    List<List<String>> lists= Collections.singletonList(Arrays.asList( model.getInventory().getColectname(),  model.getItemType().getMycase(), model.getInventory().getQuantity()+" "+model.getInventory().getMeasurements(),memberName));
         new StaticChecks(activity).setTableLayout(tableLayout,titles,lists);
-//        alertDialogBuilder
-//                .setMessage(activity.getString(R.string.selectupdateordelete))
-//                .setCancelable(false)
-//                .setView(scrollView)
-//                .setPositiveButton(activity.getString(R.string.update),new DialogInterface.OnClickListener() {
-//                    public void onClick(DialogInterface dialog,int id) {
-//                        Intent i=new Intent(activity, CollectorInventory.class);
-//                        i.putExtra("uid",model.getInventory().getInventoryId());
-//                        activity.startActivity(i);
-//                    }
-//                })
-//                .setNegativeButton(activity.getString(R.string.delete),new DialogInterface.OnClickListener() {
-//                    public void onClick(DialogInterface dialog,int id) {
-//                        db.deleteData(DBHelper.COLLECTOR_INV_TABLE,STOCKSID,model.getInventory().getInventoryId());
-//                        list.remove(position);
-//                        notifyItemRangeRemoved(0, list.size()+1);
-//                        notifyItemChanged(position);
-//                        dialog.dismiss();
-//                    }
-//                });
-//        AlertDialog alertDialog = alertDialogBuilder.create();
-//        alertDialog.setCancelable(true);
-//        alertDialog.show();
+        alertDialogBuilder
+                .setMessage(activity.getString(R.string.selectupdateordelete))
+                .setCancelable(false)
+                .setView(scrollView)
+                .setPositiveButton(activity.getString(R.string.update),new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog,int id) {
+                        Intent i=new Intent(activity, CollectorInventory.class);
+                        i.putExtra("uid",model.getInventory().getInventoryId());
+                        activity.startActivity(i);
+                    }
+                })
+                .setNegativeButton(activity.getString(R.string.delete),new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog,int id) {
+                        db.deleteData(DBHelper.COLLECTOR_INV_TABLE,STOCKSID,model.getInventory().getInventoryId());
+                        list.remove(position);
+                        notifyItemRangeRemoved(0, list.size()+1);
+                        notifyItemChanged(position);
+                        dialog.dismiss();
+                    }
+                });
+        AlertDialog alertDialog = alertDialogBuilder.create();
+        alertDialog.setCancelable(true);
+        alertDialog.show();
 
     }
 

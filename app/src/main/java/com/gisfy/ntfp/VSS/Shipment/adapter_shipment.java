@@ -90,7 +90,7 @@ public class adapter_shipment  extends RecyclerView.Adapter<adapter_shipment.Vie
                 permissionUtils = new PermissionUtils();
                 if (permissionUtils.checkPermission(activity, 1, view)) {
                     try {
-                        activity.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("http://13.127.166.242/NTFPIMS/VSSTransitPass.aspx?ShipmentNumber="+data.getUid())));
+                        activity.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("http://vanasree.com/NTFPIMS/VSSTransitPass.aspx?ShipmentNumber="+data.getUid())));
                     } catch (Exception e) {
                         e.getStackTrace();
                     }
@@ -147,8 +147,8 @@ public class adapter_shipment  extends RecyclerView.Adapter<adapter_shipment.Vie
             for (TransitNTFPModel model1:ntfps){
                 List<String> list=new ArrayList<>();
                 list.add(transit);
-                list.add(model1.getnTFPmalayalamname()+"("+model1.getnTFPName()+")");
-                list.add(model1.getQuantity()+model1.getUnit());
+                list.add(model1.getnTFPmalayalamname());
+                list.add(model1.getQuantity()+" "+model1.getUnit());
                 list.add(String.valueOf(model1.getStocksId()));
                 lists.add(list);
                 Log.i("shipmentdataList",lists.toString());

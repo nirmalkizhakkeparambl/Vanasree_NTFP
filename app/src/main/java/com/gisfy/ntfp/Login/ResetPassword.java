@@ -70,7 +70,7 @@ public class ResetPassword extends AppCompatActivity {
                                 jsonObject.put("Password", password.getText().toString());
                                 jsonObject.put("Role",pref.getString("Role"));
 
-                                putData(jsonObject,"http://13.127.166.242/NTFPAPI/API/ResetPassword");
+                                putData(jsonObject,"http://vanasree.com/NTFPAPI/API/ResetPassword");
 
                             } catch (Exception e) {
                                 e.printStackTrace();

@@ -70,16 +70,18 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static com.gisfy.ntfp.SqliteHelper.DBHelper.STOCKSID;
+import static com.gisfy.ntfp.SqliteHelper.DBHelper.VSS;
 
-public class  CollectorInventory extends AppCompatActivity {
+public class CollectorInventory extends AppCompatActivity {
 
     private TextInputEditText vss,division,range,quantity;
-    private TextView date;
+    private TextView date,headd,indication;
     private Spinner measurement;
-    private AutoCompleteTextView ntfptype,member,products,collector;
+    private AutoCompleteTextView ntfptype,member,products,collector,vssSelect;
     private Button proceed;
     private StaticChecks checks;
     private NTFP ntfpModel=null;
+    boolean flag = true;
 
     private NTFP.ItemType itemTypeModel =null;
     private MemberModel memberModel = null;
@@ -90,15 +92,18 @@ public class  CollectorInventory extends AppCompatActivity {
     private NtfpDao dao;
     private SharedPref pref;
     boolean spinnerflag = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_inventory);
         intiViews();
         pref = new SharedPref(this);
+
         collector.setText(pref.getCollector().getCollectorName());
         collector.setEnabled(false);
         dao = SynchroniseDatabase.getInstance(this).ntfpDao();
+
 
 
         if (getIntent().hasExtra("uid")) {
@@ -109,7 +114,7 @@ public class  CollectorInventory extends AppCompatActivity {
             itemTypeModel = relation.getItemType();
             Log.i("getNTFP",relation.getNtfp()+"");
             Log.i("getNTFPscientificname",relation.getNtfp().getNTFPscientificname()+"");
-            products.setText(relation.getNtfp()+"",false);
+            products.setText(relation.getNtfp().getNTFPscientificname()+"",false);
             ntfpModel = relation.getNtfp();
             String memberName;
             if (relation.getMember()!=null) memberName = relation.getMember().getName();
@@ -131,6 +136,17 @@ public class  CollectorInventory extends AppCompatActivity {
                     if(itemTypeModel!=null){
                             if (!measurement.getSelectedItem().toString().equals("Select Measurement")){
                     if (!TextUtils.isEmpty(quantity.getText().toString())) {
+                        String amundBy=(String) measurement.getSelectedItem();
+
+                        if((flag == false) && (amundBy.equals("Kilogram")||amundBy.equals("Gram"))){
+                            Toast.makeText(CollectorInventory.this, "Select required Unit first", Toast.LENGTH_SHORT).show();
+
+                        }
+                        if((flag == true) && (amundBy.equals("Litre")||amundBy.equals("Millilitre"))){
+                            Toast.makeText(CollectorInventory.this, "Select required Unit first", Toast.LENGTH_SHORT).show();
+
+                        }
+                        else if(((flag != false) && (amundBy.equals("Kilogram")||amundBy.equals("Gram")))||((flag != true) && (amundBy.equals("Litre")||amundBy.equals("Millilitre")))){
                         try {
                             InventoryEntity entity = new InventoryEntity(
                                     inventoryId,
@@ -138,9 +154,13 @@ public class  CollectorInventory extends AppCompatActivity {
                                     memberModel!=null?memberModel.getMemberId():-1,
                                     itemTypeModel.getItemId(),
                                     ntfpModel.getNid(),
+                                    "",
+                                    "0",
+                                    collector.getText().toString(),
                                     "NA",
                                     measurement.getSelectedItem().toString(),
                                     Double.parseDouble(quantity.getText().toString()),
+                                    0.0,
                                     0.0,
                                     date.getText().toString());
                             dao.insertInventory(entity);
@@ -148,7 +168,7 @@ public class  CollectorInventory extends AppCompatActivity {
                         } catch (Exception e) {
                             e.printStackTrace();
                             SnackBarUtils.ErrorSnack(CollectorInventory.this, getString(R.string.somethingwentwrong));
-                        }
+                        }}
                     }else { Toast.makeText(CollectorInventory.this, "Please Enter Quantity", Toast.LENGTH_SHORT).show(); }
                     }else { Toast.makeText(CollectorInventory.this, "Please Select Unit Measurement", Toast.LENGTH_SHORT).show(); }
                     }else { Toast.makeText(CollectorInventory.this, "Please Select NTFP Names And Ntfp Type", Toast.LENGTH_SHORT).show(); }
@@ -158,9 +178,11 @@ public class  CollectorInventory extends AppCompatActivity {
     }
 
     private void intiViews() {
+        findViewById(R.id.calC).setVisibility(View.GONE);
         findViewById(R.id.amountLayout).setVisibility(View.GONE);
         findViewById(R.id.gradeTitle).setVisibility(View.GONE);
         findViewById(R.id.ntfpgrade).setVisibility(View.GONE);
+        findViewById(R.id.edit_lose).setVisibility(View.GONE);
         collector = findViewById(R.id.collector_spinner);
         checks=new StaticChecks(this);
         pref=new SharedPref(this);
@@ -172,15 +194,20 @@ public class  CollectorInventory extends AppCompatActivity {
         proceed=findViewById(R.id.add_collector_proceed);
         proceed.setText(getResources().getString(R.string.addinv));
         vss=findViewById(R.id.vss_name);
+        vssSelect=findViewById(R.id.vss_spinner);
         range=findViewById(R.id.range_name);
+        indication = findViewById(R.id.measurementincation);
         division=findViewById(R.id.division_name);
         measurement=findViewById(R.id.measurement);
         final Calendar c = Calendar.getInstance();
+        headd=findViewById(R.id.vss_spinnerHead);
         Date d = c.getTime();
         SimpleDateFormat format1 = new SimpleDateFormat("dd-MM-yyyy");
         String date1 = format1.format(d);
         date.setText(date1);
         quantity.setFilters(new InputFilter[]{new CollectorInventory.DecimalDigitsInputFilter(4, 2)});
+        vssSelect.setVisibility(View.GONE);
+        headd.setVisibility(View.GONE);
 
         findViewById(R.id.back).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -205,7 +232,6 @@ public class  CollectorInventory extends AppCompatActivity {
         ntfpTypeAdapter = new ArrayAdapter<>(this, R.layout.multiline_spinner_dropdown_item, dao.getAllNTFPTypes());
         ntfptype.setAdapter(ntfpTypeAdapter);
 
-
         SnackBarUtils.initAutoSpinner(new AutoCompleteTextView[]{products,collector,member});
         ntfptype.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
@@ -215,7 +241,9 @@ public class  CollectorInventory extends AppCompatActivity {
                 }else{
                     ntfptype.showDropDown();
                 }
+
             }
+
         });
         ntfptype.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -224,6 +252,7 @@ public class  CollectorInventory extends AppCompatActivity {
                     Toast.makeText(CollectorInventory.this, "Select NTFP first", Toast.LENGTH_SHORT).show();
                 }else{
                     ntfptype.showDropDown();
+
                 }
             }
         });
@@ -246,6 +275,18 @@ public class  CollectorInventory extends AppCompatActivity {
                 if (ntfpModel!=null){
                     ntfpTypeAdapter = new ArrayAdapter<NTFP.ItemType>(CollectorInventory.this,R.layout.multiline_spinner_dropdown_item,dao.getItemTypesFromNid(ntfpModel.getNid()));
                     ntfptype.setAdapter(ntfpTypeAdapter);
+                    Log.i("unittttAd",ntfpModel.getUnit().toString()+"")  ;
+                    String UNITT = ntfpModel.getUnit();
+                    Log.i("unittttUNIT",UNITT+"")  ;
+                    if(UNITT.equals("litre") ) {
+                        flag = false;
+                        indication.setText("Unit of Measurement in Liter*");
+
+                    }else {
+                        flag = true;
+                        indication.setText("Unit of Measurement in Kilogram*");
+
+                    }
                 }
             }
         });
@@ -255,6 +296,25 @@ public class  CollectorInventory extends AppCompatActivity {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 if (ntfpModel!=null && ntfpTypeAdapter!=null){
                     itemTypeModel = ntfpTypeAdapter.getItem(position);
+
+//                    Log.i("UnitPara382",ntfpModel.getUnit()+"");
+//                    if(ntfpModel.getUnit() == "kg") {
+//
+//
+//                        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(
+//                                getApplicationContext(), R.array.measurementLiter, android.R.layout.simple_spinner_item);
+//                        adapter.setDropDownViewResource(R.layout.spinner_layout);
+//                        measurement.setAdapter(adapter);
+//                    }
+//                    else
+//                    {
+//                        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(
+//                                getApplicationContext(), R.array.measurementKG, android.R.layout.simple_spinner_item);
+//                        adapter.setDropDownViewResource(R.layout.spinner_layout);
+//                        measurement.setAdapter(adapter);
+//
+//
+//                    }
                 }else
                     Toast.makeText(CollectorInventory.this, "select NTFP first", Toast.LENGTH_SHORT).show();
             }
@@ -288,16 +348,19 @@ public class  CollectorInventory extends AppCompatActivity {
         return flag;
     }
     public void measurementSpinner(Spinner mSpinner, String compareValue) {
-        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this, R.array.measurement, R.layout.spinner_layout);
-        adapter.setDropDownViewResource(R.layout.spinner_layout);
-        mSpinner.setAdapter(adapter);
-        int arg2;
-        if (compareValue != null) {
-            arg2 = adapter.getPosition(compareValue);
-            mSpinner.setSelection(arg2);
-            if (arg2 != 0) {
-                spinnerflag = true;
+        Log.i("Log291",ntfpModel.getUnit()+"");
+     //   if(ntfpModel.getUnit()=="kg") {
+            ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this, R.array.measurementKG, R.layout.spinner_layout);
+            adapter.setDropDownViewResource(R.layout.spinner_layout);
+            mSpinner.setAdapter(adapter);
+            int arg2;
+            if (compareValue != null) {
+                arg2 = adapter.getPosition(compareValue);
+                mSpinner.setSelection(arg2);
+                if (arg2 != 0) {
+                    spinnerflag = true;
+                }
             }
-        }
-    }
+//        }
+   }
 }

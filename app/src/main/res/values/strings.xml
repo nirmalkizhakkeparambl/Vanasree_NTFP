@@ -6,24 +6,31 @@
         <item>ST</item>
         <item>General</item>
     </array>
-    <array name="sampleSpinnerEd">
-        <item>select qualification</item>
-        <item>Illiterate</item>
-        <item>primary</item>
-        <item>10th</item>
-        <item >12th</item>
-        <item>graduation</item>
-        <item>post graduation</item>
-    </array>
-    <array name="measurement">
+    <array name="measurementKG">
         <item>Select Measurement</item>
-        <item>kilogram</item>
+        <item>Kilogram</item>
         <item>Gram</item>
+        <item>Litre</item>
+        <item>Millilitre</item>
+    </array>
+    <array name="measurementLiter">
+        <item>Select Measurement</item>
+        <item>Litre</item>
+        <item>Millilitre</item>
     </array>
     <array name="addfamily">
         <item>Select</item>
         <item>Yes</item>
         <item>No</item>
+    </array>
+    <array name="sampleSpinnerEd">
+    <item>select qualification</item>
+    <item>Illiterate</item>
+    <item>primary</item>
+    <item>10th</item>
+    <item >12th</item>
+    <item>graduation</item>
+    <item>post graduation</item>
     </array>
     <array name="relation">
         <item>Select Relation</item>
@@ -82,13 +89,18 @@
     <array name="transit_titles">
         <item>NTFP</item>
         <item>Quantity</item>
-        <item>Member Name</item>
+        <item>Member ID </item>
     </array>
 
     <array name="transit_titles2">
         <item>NTFP</item>
         <item>Quantity</item>
         <item>Collector Name</item>
+    </array>
+    <array name="transit_titles3">
+        <item>NTFP</item>
+        <item>Quantity</item>
+        <item>Member Name</item>
     </array>
 
     <array name="vss_transit_titles">
@@ -170,7 +182,9 @@
     <string name="rangename" translatable="false">Range Name*</string>
     <string name="villagename" translatable="false">Village Name*</string>
     <string name="collectorname" translatable="false">Collector Name*</string>
+    <string name="collectornamep" translatable="false">Collector Name</string>
     <string name="spoucename" translatable="false">Spouse Name*</string>
+    <string name="spoucenamep" translatable="true">Spouse Name</string>
     <string name="socialcat" translatable="false">Select Social Category*</string>
     <string name="age" translatable="false">Age*</string>
     <string name="gender" translatable="false">Select Gender*</string>
@@ -238,10 +252,10 @@
     <string name="range" translatable="false">"Range "</string>
 
 
-    <string name="village" translatable="false">"Village: "</string>
+    <string name="village" translatable="false">"Village "</string>
     <string name="vss" translatable="false">"VSS Name: "</string>
-    <string name="vsshead" translatable="false">VSS Secretary:</string>
-    <string name="phoneno" translatable="false">Phone Number:</string>
+    <string name="vsshead" translatable="false">VSS Secretary</string>
+    <string name="phoneno" translatable="false">Phone Number</string>
     <string name="unabletofetch">Unable to fetch details</string>
     <string name="somethingwentwrong">Some thing went wrong</string>
     <string name="updatecollector">Update Collector</string>
@@ -292,7 +306,7 @@
     <string name="rejected">Rejected</string>
     <string name="pending">Pending</string>
     <string name="required">" is required"</string>
-    <string name="selectanyoption">please select any option from spinner</string>
+    <string name="selectanyoption">please select any option from list</string>
     <string name="nointernet">No Internet Connection..</string>
     <string name="afternoon">Good AfterNoon,</string>
     <string name="evening">Good Evening,</string>
@@ -422,8 +436,8 @@
     <string name="transitfor">Transit To</string>
     <string name="enterscstcategory">"Enter ScSt Federation "</string>
     <string name="pleaseselecttransitfor">Please Select Transit Data</string>
-    <string name="profileURL">http://13.127.166.242/NTFPProfilePictures/</string>
-    <string name="baseURL">http://13.127.166.242/</string>
+    <string name="profileURL">http://vanasree.com/NTFPProfilePictures/</string>
+    <string name="baseURL">http://vanasree.com/</string>
     <string name="type_to_search">Type to search</string>
     <string name="selectntfpgrade">Select NTFP Grade*</string>
     <string name="action_settings">Settings</string>

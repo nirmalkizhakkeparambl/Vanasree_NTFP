@@ -25,6 +25,7 @@ import com.androidbuts.multispinnerfilter.MultiSpinnerListener;
 import com.androidbuts.multispinnerfilter.SingleSpinnerListener;
 import com.androidbuts.multispinnerfilter.SingleSpinnerSearch;
 import com.gisfy.ntfp.Collectors.CollectorInventory;
+import com.gisfy.ntfp.Collectors.CollectorStockModel;
 import com.gisfy.ntfp.HomePage.NTFPModel;
 import com.gisfy.ntfp.Login.Models.VSSUser;
 import com.gisfy.ntfp.R;
@@ -40,6 +41,7 @@ import com.gisfy.ntfp.Utils.SharedPref;
 import com.gisfy.ntfp.Utils.SnackBarUtils;
 import com.gisfy.ntfp.Utils.StaticChecks;
 import com.gisfy.ntfp.VSS.Payment.Model_payment;
+import com.gisfy.ntfp.VSS.RequestForm.StocksModel;
 import com.gisfy.ntfp.VSS.Shipment.edit_shipment;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.gson.Gson;
@@ -65,21 +67,26 @@ import okhttp3.RequestBody;
 
 public class edit_inventory extends AppCompatActivity {
 
-    private TextInputEditText vss,division,range,quantity, amountPaid;
+    private TextInputEditText vss,division,range,quantity , loseQ , amountPaid;
     private TextView date;
     private Spinner ntfpgrade,measurement;
-    private AutoCompleteTextView ntfptype,member,products,collector;
-    private Button proceed;
+    private AutoCompleteTextView ntfptype,member,products,collector,vssSelect;
+    private Button proceed,AmoundCalc;
     private StaticChecks checks;
     private NTFP ntfpModel=null;
     private CollectorsModel collectorModel = null;
     private NTFP.ItemType itemTypeModel =null;
     private MemberModel memberModel = null;
+    private StocksModel stmodel =null;
     private ArrayAdapter<NTFP.ItemType> ntfpTypeAdapter = null;
     private ArrayAdapter<MemberModel> memberAdapter=null;
     private String uuid="";
+    private int mmid ;
+    public  String vssnamepage;
 
     private DBHelper db;
+    private CollectorStockModel model;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -88,6 +95,8 @@ public class edit_inventory extends AppCompatActivity {
         db = new DBHelper(this);
         Intent intentget= getIntent();
         Bundle b = intentget.getExtras();
+        this.model = model;
+        Log.i("MMMMeeee","");
 
         quantity.setFilters(new InputFilter[]{new DecimalDigitsInputFilter(4, 2)});
 
@@ -101,21 +110,48 @@ public class edit_inventory extends AppCompatActivity {
             date.setText((String) b.get("dataget"));
             String intentMember = "";
             if (getIntent().hasExtra("memberId"))
-                intentMember = getIntent().getStringExtra("memberId");
+
+                Log.i("memberIDD",intentMember);
+                mmid = Integer.parseInt(getIntent().getStringExtra("memberId"));
 
         } else if(getIntent().hasExtra("uid")){
             uuid = getIntent().getStringExtra("uid");
             new populateData().execute();
+            Log.i("CCCCIDD00",uuid+"");
+            if(uuid ==""){
+                if(collectorModel!=null){
+                   uuid =  String.valueOf(collectorModel.getCid());
+
+                 Log.i("CCCCIDD",uuid+"");
+                }
+
+            }
+            if(member.getText().toString().length()!=0){
+                Log.d("MMMM","");
+
+
+                mmid= model.getMemberId();
+                memberModel.setMemberId(mmid);
+
+
+            }
+
         }
         proceed.setOnClickListener(new View.OnClickListener() {
+
+
             @Override
             public void onClick(View view) {
+                Log.i("REMESHHH","");
+                if((vssSelect.getText().toString().equals(vssnamepage))){
+                    Log.i("MMMM@@@@@",mmid+"");
+
                 if (collectorModel!=null && itemTypeModel!=null && ntfpModel!=null)
                     if (checks.checkETList(new TextInputEditText[]{vss,division,range,quantity})) {
                         try {
                             Date d = new Date();
                             Inventory model = new Inventory(
-                                    memberModel.getMemberId(),
+                                    mmid,
                                     uuid,
                                     vss.getText().toString(),
                                     division.getText().toString(),
@@ -124,6 +160,7 @@ public class edit_inventory extends AppCompatActivity {
                                     String.valueOf(ntfpModel.getNid()),
                                     measurement.getSelectedItem().toString(),
                                     quantity.getText().toString(),
+                                    loseQ.getText().toString(),
                                     date.getText().toString(),
                                     amountPaid.getText().toString(),
                                     itemTypeModel.getMycase()+"-"+itemTypeModel.getItemId(),
@@ -140,11 +177,52 @@ public class edit_inventory extends AppCompatActivity {
                             db.insertData(modelPayment);
                             startActivity(new Intent(edit_inventory.this, list_inventory.class));
                         } catch (Exception e) {
+                            String exc = e.getLocalizedMessage();
+                            Log.i("ERORREditP1",exc+"");
                             e.printStackTrace();
                             SnackBarUtils.ErrorSnack(edit_inventory.this, getString(R.string.somethingwentwrong));
                         }
                     }
-            }
+            }else {
+                    Log.i("MMMM@@@@@",mmid+"");
+                    if(collector.getText().length()!=0)
+                    if (checks.checkETList(new TextInputEditText[]{vss,division,range,quantity})) {
+                        try {
+                            Date d = new Date();
+                            Inventory model = new Inventory(
+                                    00,
+                                    uuid,
+                                    vss.getText().toString(),
+                                    division.getText().toString(),
+                                    range.getText().toString(),
+                                    collector.getText().toString(),
+                                    String.valueOf(ntfpModel.getNid()),
+                                    measurement.getSelectedItem().toString(),
+                                    quantity.getText().toString(),
+                                    loseQ.getText().toString(),
+                                    date.getText().toString(),
+                                    amountPaid.getText().toString(),
+                                    itemTypeModel.getMycase()+"-"+itemTypeModel.getItemId(),
+                                    ntfpgrade.getSelectedItemPosition() != 0 ? ntfpgrade.getSelectedItem().toString() : "",
+                                    0,
+                                    0,
+                                    0);
+                            db.insertData(model);
+                            Model_payment modelPayment = new Model_payment("TRANS" + d.getDay() + d.getMonth() + d.getYear() + d.getHours() + d.getMinutes() + d.getSeconds(),
+                                    vss.getText().toString(), division.getText().toString(),
+                                    range.getText().toString(), amountPaid.getText().toString(), date.getText().toString(), "", "",
+                                    "Made",collector.getText().toString(), ntfpModel.getNTFPscientificname(), measurement.getSelectedItem().toString(),
+                                    quantity.getText().toString(), 0, 0);
+                            db.insertData(modelPayment);
+                            startActivity(new Intent(edit_inventory.this, list_inventory.class));
+                        } catch (Exception e) {
+                            String exc = e.getLocalizedMessage();
+                            Log.i("ERORREditP",exc+"");
+                            e.printStackTrace();
+                            SnackBarUtils.ErrorSnack(edit_inventory.this, getString(R.string.somethingwentwrong));
+                        }
+                    }
+                }}
         });
     }
 
@@ -157,12 +235,15 @@ public class edit_inventory extends AppCompatActivity {
         ntfptype=findViewById(R.id.ntfptype);
         ntfpgrade=findViewById(R.id.ntfpgrade);
         quantity=findViewById(R.id.edit_quantity);
+        loseQ=findViewById(R.id.edit_lose);
         amountPaid= findViewById(R.id.amountPaid);
         date=findViewById(R.id.date);
-        products=findViewById(R.id.spinner_ntfps);
-        proceed=findViewById(R.id.add_collector_proceed);
+        products = findViewById(R.id.spinner_ntfps);
+        AmoundCalc = findViewById(R.id.calC);
+        proceed = findViewById(R.id.add_collector_proceed);
         proceed.setText(getResources().getString(R.string.addinv));
-        vss=findViewById(R.id.vss_name);
+        vss = findViewById(R.id.vss_name);
+        vssSelect=findViewById(R.id.vss_spinner);
         range=findViewById(R.id.range_name);
         division=findViewById(R.id.division_name);
         measurement=findViewById(R.id.measurement);
@@ -173,6 +254,11 @@ public class edit_inventory extends AppCompatActivity {
         String date1 = format1.format(d);
         date.setText(date1);
         quantity.setFilters(new InputFilter[]{new edit_inventory.DecimalDigitsInputFilter(4, 2)});
+        VSSUser user = new SharedPref(edit_inventory.this).getVSS();
+        Log.i("VSSSnme",user.getvSSName()+"");
+        vssSelect.setText(user.getvSSName());
+        vssnamepage = user.getvSSName();
+
 
         findViewById(R.id.back).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -183,8 +269,12 @@ public class edit_inventory extends AppCompatActivity {
 
         NtfpDao dao = SynchroniseDatabase.getInstance(this).ntfpDao();
 
-        ArrayAdapter<CollectorsModel> collectorAdapter = new ArrayAdapter<CollectorsModel>(this,R.layout.multiline_spinner_dropdown_item,dao.getAllCollector());
-        collector.setAdapter(collectorAdapter);
+//  if((vssselect.getText().equals("Current VSS")) || vssselect.getText().equals("")){
+
+    ArrayAdapter<CollectorsModel> collectorAdapter = new ArrayAdapter<CollectorsModel>(this,R.layout.multiline_spinner_dropdown_item,dao.getAllCollector());
+    collector.setAdapter(collectorAdapter);
+
+
 
         ArrayAdapter<NTFP> ntfpAdapter = new ArrayAdapter<NTFP>(this,R.layout.multiline_spinner_dropdown_item,dao.getAllNTFPs());
         products.setAdapter(ntfpAdapter);
@@ -198,7 +288,9 @@ public class edit_inventory extends AppCompatActivity {
                 if (collectorModel==null){
                     Toast.makeText(edit_inventory.this, "Select collector first", Toast.LENGTH_SHORT).show();
                 }else{
+
                     member.showDropDown();
+                    Log.i("MMMMMMM","");
                 }
 
             }
@@ -265,22 +357,50 @@ public class edit_inventory extends AppCompatActivity {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 if (ntfpModel!=null && ntfpTypeAdapter!=null){
                     itemTypeModel = ntfpTypeAdapter.getItem(position);
+                   Log.i("unitttt",ntfpModel.getUnit().toString()+"")  ;
                 }else
                     Toast.makeText(edit_inventory.this, "select NTFP first", Toast.LENGTH_SHORT).show();
             }
         });
 
-        quantity.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+//        quantity.addTextChangedListener(new TextWatcher() {
+//            @Override
+//            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+//
+//            }
+//
+//            @Override
+//            public void onTextChanged(CharSequence s, int start, int before, int count) {
+//                if (itemTypeModel==null && ntfpgrade.getSelectedItemPosition()<1)
+//                    Toast.makeText(edit_inventory.this, "Select type and grade first", Toast.LENGTH_SHORT).show();
+//                else{
+//                    double basePrice;
+//                    if (ntfpgrade.getSelectedItemPosition()==1)
+//                        basePrice = itemTypeModel.getGrade1Price();
+//                    else if (ntfpgrade.getSelectedItemPosition() == 2)
+//                        basePrice = itemTypeModel.getGrade2Price();
+//                    else
+//                        basePrice = itemTypeModel.getGrade3Price();
+//
+//                    if (quantity.getText().length()>0)
+//                        amountPaid.setText(String.valueOf(Double.parseDouble(quantity.getText().toString())*basePrice));
+//                    else
+//                        amountPaid.setText("");
+//                }
+//            }
+//
+//            @Override
+//            public void afterTextChanged(Editable s) {
+//
+//            }
+//        });
 
-            }
-
+        AmoundCalc.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                if (itemTypeModel==null && ntfpgrade.getSelectedItemPosition()<1)
-                    Toast.makeText(edit_inventory.this, "Select type and grade first", Toast.LENGTH_SHORT).show();
-                else{
+            public void onClick(View view) {
+
+                if (itemTypeModel!=null && ntfpgrade.getSelectedItemPosition()>0)
+                {
                     double basePrice;
                     if (ntfpgrade.getSelectedItemPosition()==1)
                         basePrice = itemTypeModel.getGrade1Price();
@@ -289,8 +409,11 @@ public class edit_inventory extends AppCompatActivity {
                     else
                         basePrice = itemTypeModel.getGrade3Price();
 
+
                     String quntityM=quantity.getText().toString();
+                    String loseAmound = loseQ.getText().toString();
                     if (quntityM.length()>0) {
+                        quntityM = String.valueOf(Double.parseDouble(quntityM) - Double.parseDouble(loseAmound));
 
 
                         String amundBy=(String) measurement.getSelectedItem();
@@ -302,17 +425,23 @@ public class edit_inventory extends AppCompatActivity {
                             float fi=(Float.parseFloat(amound)/1000);
 
                             amountPaid.setText(String.valueOf(fi));
+                        }else if(amundBy.equals("Liter")){
+                            amountPaid.setText(String.valueOf(Double.parseDouble(quntityM) * basePrice));
+                        }else if(amundBy.equals("Milliliter")){
+                            String amound = String.valueOf(Double.parseDouble(quntityM) * basePrice);
+                            float fi=(Float.parseFloat(amound)/1000);
+
+                            amountPaid.setText(String.valueOf(fi));
                         }
 
-
-
                     }else{
-                        amountPaid.setText("");}
-                }
-            }
+                        amountPaid.setText("");
 
-            @Override
-            public void afterTextChanged(Editable s) {
+                    }
+                }
+                else{
+                    Toast.makeText(edit_inventory.this, "Select type and grade first", Toast.LENGTH_SHORT).show();
+                }
 
             }
         });

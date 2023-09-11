@@ -11,6 +11,7 @@ public class Inventory implements Serializable {
     private String ntfp;
     private String unit;
     private String quantity;
+    private String loseAmound;
     private String date;
     private String amount;
     private String ntfpType;
@@ -21,7 +22,7 @@ public class Inventory implements Serializable {
     private int memberId;
     private boolean isSelected;
 
-    public Inventory(int memberId,String uid, String vss, String division, String range, String collector, String ntfp, String unit, String quantity, String date, String amount,String ntfpType,String ntfpGrade, int transit, int payment, int synced) {
+    public Inventory(int memberId,String uid, String vss, String division, String range, String collector, String ntfp, String unit, String quantity,String loseAmound, String date, String amount,String ntfpType,String ntfpGrade, int transit, int payment, int synced) {
         this.memberId = memberId;
         this.uid = uid;
         this.vss = vss;
@@ -31,6 +32,8 @@ public class Inventory implements Serializable {
         this.ntfp = ntfp;
         this.unit = unit;
         this.quantity = quantity;
+        this.loseAmound = loseAmound;
+
         this.date = date;
         this.amount = amount;
         this.transit = transit;
@@ -39,6 +42,14 @@ public class Inventory implements Serializable {
         this.ntfpType=ntfpType;
         this.ntfpGrade=ntfpGrade;
         this.isSelected = false;
+    }
+
+    public String getLoseAmound() {
+        return loseAmound;
+    }
+
+    public void setLoseAmound(String loseAmound) {
+        this.loseAmound = loseAmound;
     }
 
     public String getNtfpGrade() {

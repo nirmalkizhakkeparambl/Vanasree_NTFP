@@ -280,7 +280,8 @@
                     android:id="@+id/idno"
                     android:maxLength="20"
                     android:maxLines="1"
-                    android:digits="QWERTYUIOPASDFGHJKLZXCVBNMqwertyuiopasdfghjklzxcvbnm 1234567890"
+                    android:inputType="textCapCharacters"
+                    android:digits="QWERTYUIOPASDFGHJKLZXCVBNM1234567890"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content" />
             </com.google.android.material.textfield.TextInputLayout>
@@ -305,24 +306,23 @@
                 android:layout_marginEnd="32dp"/>
 
 
-
-            <com.google.android.material.textfield.TextInputLayout
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                android:layout_width="match_parent"
+            <TextView
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:text="Select qualification*"
                 android:layout_marginStart="32dp"
                 android:layout_marginTop="30dp"
                 android:layout_marginEnd="32dp"
-                android:hint="@string/educational">
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/edit_education"
-                    android:maxLength="20"
-                    android:maxLines="1"
-                    android:digits="QWERTYUIOPASDFGHJKLZXCVBNMqwertyuiopasdfghjklzxcvbnm "
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
-            </com.google.android.material.textfield.TextInputLayout>
+                android:textColor="@color/silver"/>
 
+
+            <Spinner
+                android:id="@+id/spinner_eduM"
+                android:layout_width="match_parent"
+                android:layout_height="32dp"
+                android:layout_marginStart="32dp"
+                android:layout_marginEnd="32dp"
+                android:entries="@array/sampleSpinnerEd" />
 
             <com.google.android.material.textfield.TextInputLayout
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"

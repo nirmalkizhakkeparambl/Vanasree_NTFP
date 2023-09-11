@@ -21,11 +21,16 @@ public class InventoryEntity {
     private int ntfpId;
     @SerializedName("NTFPTypeId")
     private int typeId;
+    private String vssname;
+    private String vssnamesle;
+    private String colectname;
     private String grade;
     @SerializedName("Unit")
     private String measurements;
     @SerializedName("Quantity")
     private double quantity;
+    @SerializedName("LoseAmound")
+    private double loseAmound;
     private double price;
     @SerializedName("DateTime")
     private String date;
@@ -42,17 +47,31 @@ public class InventoryEntity {
         this.random = random;
     }
 
-    public InventoryEntity(@NonNull String inventoryId, int collectorId, int memberId, int ntfpId, int typeId, String grade, String measurements, double quantity, double price, String date) {
+    public InventoryEntity(@NonNull String inventoryId, int collectorId, int memberId, int ntfpId, int typeId ,String vssname,String vssnamesle,String colectname,String grade, String measurements, double quantity,double loseAmound, double price, String date) {
         this.inventoryId = inventoryId;
         this.collectorId = collectorId;
         this.memberId = memberId;
         this.ntfpId = ntfpId;
         this.typeId = typeId;
+
+        this.vssname=vssname;
+        this.vssnamesle=vssnamesle;
+
+        this.colectname=colectname;
         this.grade = grade;
         this.measurements = measurements;
         this.quantity = quantity;
+        this.loseAmound = loseAmound;
         this.price = price;
         this.date = date;
+    }
+
+    public String getVssnamesle() {
+        return vssnamesle;
+    }
+
+    public void setVssnamesle(String vssnamesle) {
+        this.vssnamesle = vssnamesle;
     }
 
     public boolean isSynced() {
@@ -65,6 +84,22 @@ public class InventoryEntity {
 
     public String getInventoryId() {
         return inventoryId;
+    }
+
+    public String getVssname() {
+        return vssname;
+    }
+
+    public String getColectname() {
+        return colectname;
+    }
+
+    public void setColectname(String colectname) {
+        this.colectname = colectname;
+    }
+
+    public void setVssname(String vssname) {
+        this.vssname = vssname;
     }
 
     public void setInventoryId(String inventoryId) {
@@ -125,6 +160,14 @@ public class InventoryEntity {
 
     public void setQuantity(double quantity) {
         this.quantity = quantity;
+    }
+
+    public double getLoseAmound() {
+        return loseAmound;
+    }
+
+    public void setLoseAmound(double loseAmound) {
+        this.loseAmound = loseAmound;
     }
 
     public double getPrice() {

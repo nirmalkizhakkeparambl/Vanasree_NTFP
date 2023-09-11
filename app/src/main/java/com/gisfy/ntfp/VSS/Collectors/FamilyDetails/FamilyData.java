@@ -54,7 +54,7 @@ public class FamilyData implements Serializable {
         this.gender = gender;
         this.dob = dob;
         this.idtype = idtype;
-        Idno = idno;
+        this.Idno = idno;
         this.ntfps = ntfps;
         this.education = education;
         this.bankname = bankname;

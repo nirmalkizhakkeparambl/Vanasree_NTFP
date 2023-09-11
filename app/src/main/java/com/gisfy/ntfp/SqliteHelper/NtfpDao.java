@@ -44,10 +44,10 @@ public interface NtfpDao {
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     void insertAllCollector(List<CollectorsModel> collectorModels);
 
-    @Update
+    @Update(onConflict = OnConflictStrategy.REPLACE)
     void updateCollector(CollectorsModel collectorModel);
 
-    @Query("select * from CollectorsModel")
+    @Query("select * from CollectorsModel order by collectorName asc")
     List<CollectorsModel> getAllCollector();
 
     @Query("select * from CollectorsModel where Cid=:id")
@@ -91,7 +91,7 @@ public interface NtfpDao {
      * @return
      */
     @Transaction
-    @Query("select * from InventoryEntity")
+    @Query("select * from InventoryEntity where price !='' ")
     List<InventoryRelation> getAllInventories();
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)

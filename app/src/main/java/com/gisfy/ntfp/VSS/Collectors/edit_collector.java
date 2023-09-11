@@ -27,6 +27,8 @@ import com.androidbuts.multispinnerfilter.MultiSpinnerSearch;
 import com.gisfy.ntfp.Login.Models.VSSUser;
 import com.gisfy.ntfp.R;
 import com.gisfy.ntfp.SqliteHelper.DBHelper;
+import com.gisfy.ntfp.SqliteHelper.NtfpDao;
+import com.gisfy.ntfp.SqliteHelper.SynchroniseDatabase;
 import com.gisfy.ntfp.Utils.JSONStorage;
 import com.gisfy.ntfp.Utils.SharedPref;
 import com.gisfy.ntfp.Utils.SnackBarUtils;
@@ -57,10 +59,10 @@ import okhttp3.RequestBody;
 
 public class edit_collector extends AppCompatActivity {
 
-    private Spinner category,gender,idtype,addfamilySpinner;
+    private Spinner category,gender,idtype,addfamilySpinner,education;
     private MultiSpinnerSearch product;
     private TextInputEditText username, password,date;
-    private TextInputEditText village,vss,division,range,collector_name,collector_spouse,age,aadhar,education,family,bankname,info,accountno,ifsc;
+    private TextInputEditText village,vss,division,range,collector_name,collector_spouse,age,aadhar,family,bankname,info,accountno,ifsc;
     private StaticChecks check;
     private SharedPref pref;
     private Button proceed,addfamily;
@@ -69,11 +71,13 @@ public class edit_collector extends AppCompatActivity {
     private String ntfpTemp="";
     private RecyclerView recyclerView;
     private Family_adapter adapter;
+    private NtfpDao dao;
     public List<FamilyData> familylist=new ArrayList<>();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_collector);
+        dao = SynchroniseDatabase.getInstance(this).ntfpDao();
 
         intiViews();
 
@@ -137,6 +141,8 @@ public class edit_collector extends AppCompatActivity {
         proceed.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                dao.getAllCollector().clear();
+
                 if (validateData()==null){
                     check.showSnackBar(getString(R.string.fillalldata));
                 }else {
@@ -180,7 +186,7 @@ public class edit_collector extends AppCompatActivity {
         collector_spouse=findViewById(R.id.edit_spouse_name);
         age=findViewById(R.id.edit_age);
         aadhar=findViewById(R.id.edit_adhaarno);
-        education=findViewById(R.id.edit_education);
+        education=findViewById(R.id.spinner_edu);
         family=findViewById(R.id.edit_familymem);
         bankname=findViewById(R.id.edit_bankname);
         info=findViewById(R.id.edit_info);
@@ -208,9 +214,9 @@ public class edit_collector extends AppCompatActivity {
     }
 
     private Collector validateData(){
-        boolean etFlag=check.checkETList(new TextInputEditText[]{village,collector_name,collector_spouse,age,aadhar,education
+        boolean etFlag=check.checkETList(new TextInputEditText[]{village,collector_name,collector_spouse,age,aadhar
                 ,family});
-        boolean spinFlag=check.checkSpinnerList(new Spinner[]{category,gender});
+        boolean spinFlag=check.checkSpinnerList(new Spinner[]{category,gender,education});
         if (etFlag && spinFlag && product.getSelectedItems().size()>0){
             String ntfps="";
             for (KeyPairBoolData key:product.getSelectedItems()){
@@ -231,7 +237,7 @@ public class edit_collector extends AppCompatActivity {
                     idtype.getSelectedItem().toString(),
                     aadhar.getText().toString(),
                     ntfps,
-                    education.getText().toString(),
+                    education.getSelectedItem().toString(),
                     family.getText().toString(),
                     bankname.getText().toString(),
                     accountno.getText().toString(),
@@ -279,7 +285,7 @@ public class edit_collector extends AppCompatActivity {
                         gender.setSelection(Arrays.asList(getResources().getStringArray(R.array.gender)).indexOf(model.getGender()));
                         idtype.setSelection(Arrays.asList(getResources().getStringArray(R.array.IDtype)).indexOf(model.getIdtype()));
                         aadhar.setText(model.getIdno());
-                        education.setText(model.getEducation());
+                        education.setSelection(Arrays.asList(getResources().getStringArray(R.array.sampleSpinnerEd)).indexOf(model.getEducation()));
                         family.setText(model.getFamily());
                         bankname.setText(model.getBankname());
                         info.setText(model.getInfo());
@@ -390,7 +396,7 @@ public class edit_collector extends AppCompatActivity {
                 MediaType mediaType = MediaType.parse("application/json");
                 RequestBody body = RequestBody.create(mediaType, json.toString());
                 Request request = new Request.Builder()
-                        .url("http://13.127.166.242/NTFPAPI/API/NTFPList")
+                        .url("http://vanasree.com/NTFPAPI/API/NTFPList")
                         .method("POST", body)
                         .addHeader("Content-Type", "application/json")
                         .build();

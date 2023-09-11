@@ -15,15 +15,6 @@
         <item> എസ്.ടി  </item>
         <item>പൊതുവായ</item>
     </array>
-    <array name="sampleSpinnerEd">
-        <item>select qualification</item>
-        <item>Illiterate</item>
-        <item>primary</item>
-        <item>10th</item>
-        <item >12th</item>
-        <item>graduation</item>
-        <item>post graduation</item>
-    </array>
 
 
     <array name="ntfp_type">
@@ -59,7 +50,9 @@
     <string name="rangename" translatable="true">റേഞ്ച് പേര്*</string>
     <string name="villagename" translatable="true">വില്ലജ് പേര്*</string>
     <string name="collectorname" translatable="true">ശേഖരിക്കുന്ന ആളുടെ പേര്*</string>
+    <string name="collectornamep" translatable="false">ശേഖരിക്കുന്ന ആളുടെ പേര്</string>
     <string name="spoucename" translatable="true">ജീവിതപങ്കാളിയുടെ പേര്*</string>
+    <string name="spoucenamep" translatable="true">ജീവിതപങ്കാളിയുടെ പേര്</string>
     <string name="socialcat" translatable="true">സോഷ്യൽ വിഭാഗം തിരഞ്ഞെടുക്കുക*</string>
     <string name="age" translatable="true">പ്രായം*</string>
     <string name="gender" translatable="true">ലിംഗഭേദം തിരഞ്ഞെടുക്കുക*</string>
@@ -124,9 +117,9 @@
     <string name="logout" translatable="true">ലോഗൗട്ട്</string>
     <string name="division" translatable="true">"ഡിവിഷൻ "</string>
     <string name="range" translatable="true">"റേഞ്ച് "</string>
-    <string name="village" translatable="true">"വില്ലേജ്: "</string>
+    <string name="village" translatable="true">"വില്ലേജ് "</string>
     <string name="vss" translatable="true">"വി.എസ്.എസ് പേര്: "</string>
-    <string name="phoneno" translatable="true">ഫോൺ നമ്പർ:</string>
+    <string name="phoneno" translatable="true">ഫോൺ നമ്പർ</string>
     <string name="unabletofetch">വിശദാംശങ്ങൾ നേടാനായില്ല</string>
     <string name="somethingwentwrong">രേഖപ്പെടുത്തിയ വിവരം പുനർപരിശോധിക്കുക</string>
     <string name="updatecollector">ശേഖരിക്കുന്നവരെ അപ്ഡേറ്റ് ചെയ്യുക</string>
@@ -310,7 +303,7 @@
     <string name="processing_centre_confirmation">സ്ഥീതികരണം (പ്രോസസ്സിംഗ് സെന്റർ)</string>
     <string name="confirm">സ്ഥിരീകരിക്കുക</string>
 
-    <string name="vsshead" translatable="true">വിഎസ്എസ് സെക്രട്ടറി:</string>
+    <string name="vsshead" translatable="true">വിഎസ്എസ് സെക്രട്ടറി</string>
     <array name="transitfor">
         <item>Select Transit To</item>
         <item>പ്രോസസ്സിംഗ് സെന്റർ</item>
@@ -327,10 +320,17 @@
     <string name="relationship">ബന്ധം</string>
     <string name="namefamily">പേര് *</string>
     <string name="address">വിലാസം</string>
-    <array name="measurement">
+    <array name="measurementKG">
         <item>Select Measurement</item>
         <item>കിലോഗ്രാം</item>
         <item>ഗ്രാം</item>
+        <item>Litre</item>
+        <item>Millilitre</item>
+    </array>
+    <array name="measurementLiter">
+        <item>Select Measurement</item>
+        <item>Litre</item>
+        <item>Millilitre</item>
     </array>
     <array name="vehicletype">
         <item>Select Vehicle type</item>
@@ -341,12 +341,21 @@
         <item>സൈക്കിൾ</item>
         <item>ജീപ്പ്</item>
         <item>പിക്ക് അപ്പ്</item>
-        <item>വേറെ</item>
+        <item>Other</item>
     </array>
     <array name="addfamily">
         <item>Select </item>
         <item>അതെ</item>
         <item>ഇല്ല</item>
+    </array>
+    <array name="sampleSpinnerEd">
+        <item>select qualification</item>
+        <item>Illiterate</item>
+        <item>primary</item>
+        <item>10th</item>
+        <item >12th</item>
+        <item>graduation</item>
+        <item>post graduation</item>
     </array>
     <array name="relation">
         <item>Select Relation</item>

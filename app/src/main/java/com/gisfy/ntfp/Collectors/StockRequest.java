@@ -1,5 +1,6 @@
 package com.gisfy.ntfp.Collectors;
 
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
@@ -7,8 +8,10 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TableLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.gisfy.ntfp.API.RetrofitClient;
+import com.gisfy.ntfp.HomePage.Home;
 import com.gisfy.ntfp.Login.Models.CollectorUser;
 import com.gisfy.ntfp.Login.Models.RFOUser;
 import com.gisfy.ntfp.R;
@@ -17,6 +20,7 @@ import com.gisfy.ntfp.Utils.FCMNotifications;
 import com.gisfy.ntfp.Utils.SharedPref;
 import com.gisfy.ntfp.Utils.SnackBarUtils;
 import com.gisfy.ntfp.Utils.StaticChecks;
+import com.gisfy.ntfp.VSS.Collectors.list_collectors;
 import com.gisfy.ntfp.VSS.RequestForm.ChartAlert;
 import com.github.ybq.android.spinkit.SpinKitView;
 import com.google.android.material.tabs.TabLayout;
@@ -51,6 +55,7 @@ public class StockRequest extends AppCompatActivity {
     public TextInputEditText remarks;
     private RecyclerView recyclerView;
     private CollectorUser user;
+    private boolean btnFlag=false;
     final HashMap<String,Integer> json=new HashMap<>();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,7 +65,7 @@ public class StockRequest extends AppCompatActivity {
         adapter=new StockRequestAdapter(list, StockRequest.this, new StockRequestAdapter.PositionClickListener() {
             @Override
             public void itemClicked(CollectorStockModel data) {
-                String[] titles = getResources().getStringArray(R.array.transit_titles);
+                String[] titles = getResources().getStringArray(R.array.transit_titles3);
                 List<List<String>> rows = new ArrayList<>();
                 List<String> row = new ArrayList<>();
                 row.add(data.getnTFP());
@@ -72,6 +77,7 @@ public class StockRequest extends AppCompatActivity {
                 rows.add(row);
                 new ChartAlert(StockRequest.this,titles,rows).show();
             }
+
         });
         recyclerView.setAdapter(adapter);
         getData(json);
@@ -88,11 +94,9 @@ public class StockRequest extends AppCompatActivity {
             }
             @Override
             public void onTabUnselected(TabLayout.Tab tab) {
-
             }
             @Override
             public void onTabReselected(TabLayout.Tab tab) {
-
             }
         });
     }
@@ -121,6 +125,8 @@ public class StockRequest extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 new uploadTask().execute();
+                //Intent i = new Intent(StockRequest.this, Home.class);
+                //startActivity(i);
             }
         });
     }
@@ -177,24 +183,21 @@ public class StockRequest extends AppCompatActivity {
         }
         adapter.notifyDataSetChanged();
     }
-
-
     private class uploadTask extends AsyncTask<String,String,String>{
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
             findViewById(R.id.spin_kit).setVisibility(View.VISIBLE);
+            btnFlag=true;
         }
-
         @Override
         protected String doInBackground(String... strings) {
-
             Log.i("getJsonArray192",getJsonArray().toString());
             OkHttpClient client = new OkHttpClient().newBuilder().build();
             MediaType mediaType = MediaType.parse("application/json");
             RequestBody body = RequestBody.create(mediaType, getJsonArray().toString());
             Request request = new Request.Builder()
-                    .url("http://13.127.166.242/NTFPAPI/API/CollectorStockRequestToVSS")
+                    .url("http://vanasree.com//NTFPAPI/API/CollectorStockRequestToVSS")
                     .method("POST", body)
                     .addHeader("Content-Type", "application/json")
                     .build();
@@ -206,14 +209,23 @@ public class StockRequest extends AppCompatActivity {
                     return getResources().getString(R.string.somedetailsnotsynced);
             } catch (Exception e) {
                 e.printStackTrace();
+                btnFlag=false;
                 return e.getClass().getSimpleName();
             }
         }
         @Override
         protected void onPostExecute(String s) {
+            Intent i = new Intent(StockRequest.this, Home.class);
+
+            startActivity(i);
+
             super.onPostExecute(s);
             if (s.equals(getResources().getString(R.string.synced)))
-                SnackBarUtils.SuccessSnack(StockRequest.this,s);
+                Toast.makeText(getApplicationContext()
+                                ,getString(R.string.synced),
+                                Toast.LENGTH_SHORT)
+                        .show();
+
             else if(s.equals(getResources().getString(R.string.somedetailsnotsynced)))
                 SnackBarUtils.WarningSnack(StockRequest.this,getString(R.string.somedetailsnotsynced));
             else if (s.equals("JSONException")||s.equals("SQLiteException"))
@@ -221,6 +233,8 @@ public class StockRequest extends AppCompatActivity {
             else
                 SnackBarUtils.ErrorSnack(StockRequest.this,getString(R.string.servernotresponding));
             findViewById(R.id.spin_kit).setVisibility(View.GONE);
+            adapter.notifyDataSetChanged();
+
             getData(json);
         }
     }

@@ -20,6 +20,7 @@ import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.DatePicker;
+import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
 
@@ -55,13 +56,14 @@ import java.util.Objects;
 import java.util.UUID;
 
 public class CollectorsFamilyDetails extends AppCompatActivity {
-    private Spinner category, gender, idtype,relatiionspinner;
+    private Spinner category, gender, idtype,relatiionspinner,education;
     private MultiSpinnerSearch product;
-    private TextInputEditText address,village, familyname, age, aadhar, education, bankname, info, accountno, ifsc;
+    private TextInputEditText address,village, familyname, age, aadhar, bankname, info, accountno, ifsc;
     private TextInputEditText  date;
     private StaticChecks check;
     private Button proceed;
     private NTFP ntfpModel = null;
+
     private NtfpDao dao;
     private SharedPref pref;
     private HashMap<String,Integer> NtfpHashMap= new HashMap();
@@ -89,7 +91,7 @@ public class CollectorsFamilyDetails extends AppCompatActivity {
                 relatiionspinner.setSelection(Arrays.asList(getResources().getStringArray(R.array.relation)).indexOf(familyData.getRelationship()));
                 address.setText(familyData.getAddress());
                 aadhar.setText(familyData.getIdno());
-                education.setText(familyData.getEducation());
+                education.setSelection(Arrays.asList(getResources().getStringArray(R.array.sampleSpinnerEd)).indexOf(familyData.getEducation()));
                 bankname.setText(familyData.getBankname());
                 village.setText(familyData.getVillage());
                 category.setSelection(list.indexOf(familyData.getCategory()));
@@ -148,7 +150,7 @@ public class CollectorsFamilyDetails extends AppCompatActivity {
                     if(getIntent().hasExtra("Edit"))
                          intent = new Intent(CollectorsFamilyDetails.this,edit_collector.class);
                     else
-                        intent = new Intent(CollectorsFamilyDetails.this,   add_collector.class);
+                        intent = new Intent(CollectorsFamilyDetails.this,add_collector.class);
                     intent.putExtra("FamilyData",validateData());
                     intent.putExtra("projectId",projectId);
                     if (getIntent().hasExtra("position"))
@@ -180,8 +182,9 @@ public class CollectorsFamilyDetails extends AppCompatActivity {
         familyname = findViewById(R.id.familyname);
         age = findViewById(R.id.edit_age);
         aadhar = findViewById(R.id.idno);
-        education = findViewById(R.id.edit_education);
+        education = findViewById(R.id.spinner_eduM);
         bankname = findViewById(R.id.edit_bankname);
+
 
 
         findViewById(R.id.back).setOnClickListener(new View.OnClickListener() {
@@ -194,17 +197,35 @@ public class CollectorsFamilyDetails extends AppCompatActivity {
         initSpinner("");
     }
 
+    private boolean validateEditText(EditText editText){
+        String text = editText.getText().toString();
+        if(text.startsWith(" ")){
+            editText.setError("This Field is required");
+            Toast.makeText(this,"Please fill "+editText.getHint(),Toast.LENGTH_SHORT).show();
+
+            return false;
+        }
+        return true;
+    }
+
     private FamilyData validateData() {
         if (check.checkSpinnerList(new Spinner[]{relatiionspinner}))
-            if (check.checkETList(new TextInputEditText[]{ familyname, date, age, village}))
+         //   if (check.checkETList(new TextInputEditText[]{ familyname, date, age, village}))
+            if (validateEditText(familyname))
+                if (validateEditText(village))
+                if (check.checkETList(new TextInputEditText[]{  date, age}))
                 if (check.checkSpinnerList(new Spinner[]{category, gender, idtype}))
-                    if (check.checkETList(new TextInputEditText[]{ aadhar, education}))
+                    if (validateEditText(bankname))
+                        if (validateEditText(aadhar))
+                            if (check.checkSpinnerList(new Spinner[]{education}))
+                  //  if (check.checkETList(new TextInputEditText[]{ aadhar, education}))
                         if (product.getSelectedItems().size()>0) {
                             String ntfps = "";
                             for (KeyPairBoolData key : product.getSelectedItems()) {
                                 if (key.isSelected())
                                     ntfps += key.getName().trim() + ",";
                             }
+                            Log.i("CCCCCCIIII",uid+"");
                             FamilyData model = new FamilyData(
                                     projectId,
                                     uid,
@@ -217,7 +238,7 @@ public class CollectorsFamilyDetails extends AppCompatActivity {
                                     idtype.getSelectedItem().toString(),
                                     aadhar.getText().toString(),
                                     ntfpString != "" ? ntfpString : ntfps,
-                                    education.getText().toString(),
+                                    education.getSelectedItem().toString(),
                                     bankname.getText().toString(),
                                     accountno.getText().toString(),
                                     ifsc.getText().toString(),
@@ -256,7 +277,7 @@ public class CollectorsFamilyDetails extends AppCompatActivity {
                 MediaType mediaType = MediaType.parse("application/json");
                 RequestBody body = RequestBody.create(mediaType, json.toString());
                 Request request = new Request.Builder()
-                        .url("http://13.127.166.242/NTFPAPI/API/NTFPList")
+                        .url("http://vanasree.com/NTFPAPI/API/NTFPList")
                         .method("POST", body)
                         .addHeader("Content-Type", "application/json")
                         .build();

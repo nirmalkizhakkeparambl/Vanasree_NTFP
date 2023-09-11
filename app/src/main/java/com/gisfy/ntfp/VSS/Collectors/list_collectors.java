@@ -10,14 +10,19 @@ import android.widget.DatePicker;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.gisfy.ntfp.Collectors.InventoryList;
 import com.gisfy.ntfp.Login.Models.*;
 import com.gisfy.ntfp.HomePage.Home;
 import com.gisfy.ntfp.R;
 import com.gisfy.ntfp.SqliteHelper.DBHelper;
+import com.gisfy.ntfp.SqliteHelper.Entity.CollectorsModel;
+import com.gisfy.ntfp.SqliteHelper.Entity.InventoryRelation;
 import com.gisfy.ntfp.Utils.*;
 import com.gisfy.ntfp.Utils.StaticChecks;
 import com.gisfy.ntfp.VSS.Collectors.FamilyDetails.FamilyData;
 import com.gisfy.ntfp.VSS.Collectors.FamilyDetails.Family_adapter;
+import com.gisfy.ntfp.VSS.Inventory.adapter_inventory;
+import com.gisfy.ntfp.VSS.Inventory.list_inventory;
 import com.github.ybq.android.spinkit.SpinKitView;
 
 import org.json.JSONArray;
@@ -44,7 +49,6 @@ import okhttp3.Response;
 import static com.gisfy.ntfp.Utils.StaticChecks.stringtoDate;
 
 public class list_collectors extends AppCompatActivity {
-
     private DBHelper dbHelper;
     private RecyclerView recyclerView;
     private adapter_collectors adapter;
@@ -55,6 +59,8 @@ public class list_collectors extends AppCompatActivity {
     private boolean btnFlag=false;
     public List<FamilyData> familylist=new ArrayList<>();
     JSONArray jsonArray1 = new JSONArray();
+    private List<Collector> shallowCopy =new ArrayList<>();
+    private List<CollectorsModel> memberList;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -81,7 +87,13 @@ public class list_collectors extends AppCompatActivity {
                     SnackBarUtils.WarningSnack(list_collectors.this,getString(R.string.wait));
                 else {
                     if (adapter.getSelectedItems().size()>0){
-                        new uploadTask().execute();
+                        try {
+                            new uploadTask().execute();
+                            Intent i = new Intent(list_collectors.this, Home.class);
+                            startActivity(i);
+                        }catch (Exception e){
+                            Log.i("EXXXP",e+"");
+                        }
 
                     }else{
                         SnackBarUtils.ErrorSnack(list_collectors.this,"No Items Selected");
@@ -96,7 +108,6 @@ public class list_collectors extends AppCompatActivity {
             }
         });
     }
-
     private void intiViews() {
         dbHelper=new DBHelper(this);
         recyclerView=findViewById(R.id.recyclerView);
@@ -113,7 +124,6 @@ public class list_collectors extends AppCompatActivity {
                 adapter.notifyDataSetChanged();
             }
         });
-
         upload.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -123,7 +133,6 @@ public class list_collectors extends AppCompatActivity {
             }
         });
     }
-
     @Override
     public void onBackPressed() {
         if (isinActionMode) {
@@ -136,19 +145,27 @@ public class list_collectors extends AppCompatActivity {
             startActivity(i);
         }
     }
-
-
     private class fetchTask extends AsyncTask<String,String,String>{
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
             spinKitView.setVisibility(View.VISIBLE);
         }
-
         @Override
         protected String doInBackground(String... strings) {
             try {
                 list=dbHelper.getAllDataFromCollectors();
+
+
+                if (list.size()>0){
+
+                    shallowCopy = list.subList(0, list.size());
+
+                    Collections.reverse(shallowCopy);
+                    Log.i("ListSize224",shallowCopy.size()+"");
+
+                }
+
                 return "OK";
             } catch (Exception e) {
                 e.printStackTrace();
@@ -161,11 +178,24 @@ public class list_collectors extends AppCompatActivity {
             super.onPostExecute(s);
             if (!s.equals("OK"))
                 SnackBarUtils.ErrorSnack(list_collectors.this,s);
-            adapter=new adapter_collectors(list,list_collectors.this);
+
+            adapter=new adapter_collectors(shallowCopy, list_collectors.this);
             RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getApplicationContext());
+
+
             recyclerView.setLayoutManager(layoutManager);
+            if (shallowCopy.size()>0)
+                Collections.sort(shallowCopy,new  list_collectors.SortByDate());
+            recyclerView.setAdapter(adapter);
+
             recyclerView.setAdapter(adapter);
             spinKitView.setVisibility(View.GONE);
+        }
+    }
+    static class SortByDate implements Comparator<Collector> {
+        @Override
+        public int compare(Collector a, Collector b) {
+            return Boolean.compare(a.getSynced()==1, b.getSynced()==1);
         }
     }
 
@@ -205,7 +235,10 @@ public class list_collectors extends AppCompatActivity {
         protected void onPostExecute(String s) {
             btnFlag=false;
             if (s.equals(getResources().getString(R.string.synced)))
-                SnackBarUtils.SuccessSnack(list_collectors.this,s);
+                Toast.makeText(getApplicationContext()
+                                ,getString(R.string.synced),
+                                Toast.LENGTH_SHORT)
+                        .show();
             else if(s.equals(getResources().getString(R.string.somedetailsnotsynced)))
                 SnackBarUtils.WarningSnack(list_collectors.this,getString(R.string.somedetailsnotsynced));
             else if (s.equals("JSONException"))
@@ -215,12 +248,14 @@ public class list_collectors extends AppCompatActivity {
             isinActionMode=false;
             upload.setVisibility(View.GONE);
             sync.setVisibility(View.VISIBLE);
+
+//            if (shallowCopy.size()>0)
+//                Collections.sort(shallowCopy,new list_collectors.SortByDate());
             adapter.notifyDataSetChanged();
             findViewById(R.id.spin_kit).setVisibility(View.GONE);
             super.onPostExecute(s);
         }
     }
-
     private JSONArray getRequestBody(){
         JSONArray jsonArray = new JSONArray();
         for (Collector model:adapter.getSelectedItems()){
@@ -264,45 +299,76 @@ public class list_collectors extends AppCompatActivity {
         }
         return jsonArray;
     }
-
-
-    private boolean setStatus(String json) throws JSONException {
-        boolean flag=true;
-        Log.i("jresponse",json);
-        JSONArray jsonArray=new JSONArray(json);
-        for (int i=0;i<jsonArray.length();i++){
-            JSONObject details=jsonArray.getJSONObject(i);
-            if (details.getString("Status").equals("Success")) {
-                Collector model = dbHelper.getAllDataFromCollectorsWhere(" uid='" + details.getString("Random")+"'").get(0);
-                model.setSynced(1);
-                dbHelper.updateData(model);
-                String cID = details.getString("CollectorId");
+//    private boolean setStatus(String json) throws JSONException {
+//        boolean flag=true;
+//        Log.i("jresponse",json);
+//        JSONArray jsonArray=new JSONArray(json);
+//        for (int i=0;i<jsonArray.length();i++){
+//            JSONObject details=jsonArray.getJSONObject(i);
+//            if (details.getString("Status").equals("Success")) {
+//                Collector model = dbHelper.getAllDataFromCollectorsWhere(" uid='" + details.getString("Random")+"'").get(0);
+//                model.setSynced(1);
+//                dbHelper.updateData(model);
+//                String cID = details.getString("CollectorId");
+//                if (dbHelper.getAllDataFromFamilyWhere("uid='"+details.getString("Random")+"'").size()>0){
+//                    final FamilyData familymodel=dbHelper.getAllDataFromFamilyWhere("uid='"+details.getString("Random")+"'").get(0);
+//                    Log.i("familymodel",familymodel.getFamily_name()+"");
+//                    jsonArray1 = getFamilyRequestBody(familymodel, cID);
+//                    if (jsonArray1.toString()!=null){
+//                        new uploadfamilyTask().execute();
+//                    }else {
+//                        Toast.makeText(list_collectors.this, "Family Request Bosy is null", Toast.LENGTH_SHORT).show();
+//                    }
+//                }
+//            }else{
+//                flag=false;
+//                Collector model = dbHelper.getAllDataFromCollectorsWhere(" uid='" + details.getString("Random")+"'").get(0);
+//                model.setSynced(0);
+//                dbHelper.updateData(model);
+//            }
+//        }
+//        shallowCopy.clear();
+//        shallowCopy.addAll(dbHelper.getAllDataFromCollectors());
+//
+//        return flag;
+//    }
+private boolean setStatus(String json) throws JSONException {
+    boolean flag=true;
+    Log.i("jresponse",json);
+    JSONArray jsonArray=new JSONArray(json);
+    for (int i=0;i<jsonArray.length();i++){
+        JSONObject details=jsonArray.getJSONObject(i);
+        if (details.getString("Status").equals("Success")) {
+            Collector model = dbHelper.getAllDataFromCollectorsWhere("uid='" + details.getString("Random")+"'").get(0);
+            model.setSynced(1);
+            dbHelper.updateData(model);
+            String cID = details.getString("CollectorId");
                 if (dbHelper.getAllDataFromFamilyWhere("uid='"+details.getString("Random")+"'").size()>0){
-                    final FamilyData familymodel=dbHelper.getAllDataFromFamilyWhere("uid='"+details.getString("Random")+"'").get(0);
+                    int n = dbHelper.getAllDataFromFamilyWhere("uid='"+details.getString("Random")+"'").size();
+                    for(int a=0;a<n;a++){
+
+                    final FamilyData familymodel = dbHelper.getAllDataFromFamilyWhere("uid='"+details.getString("Random")+"'").get(a);
                     Log.i("familymodel",familymodel.getFamily_name()+"");
-                    jsonArray1 =   getFamilyRequestBody(familymodel, cID);
+                    jsonArray1 = getFamilyRequestBody(familymodel, cID);
                     if (jsonArray1.toString()!=null){
                         new uploadfamilyTask().execute();
                     }else {
-                        Toast.makeText(list_collectors.this, "Family Request Bosy is null", Toast.LENGTH_SHORT).show();
-
-                    }
-                }
-
-
-            }else{
-                flag=false;
-                Collector model = dbHelper.getAllDataFromCollectorsWhere(" uid='" + details.getString("Random")+"'").get(0);
-                model.setSynced(0);
-                dbHelper.updateData(model);
+                        Toast.makeText(list_collectors.this, "Family Request is null", Toast.LENGTH_SHORT).show();
+                    }}
             }
+         }else{
+            flag=false;
+            Collector model = dbHelper.getAllDataFromCollectorsWhere(" uid='" + details.getString("Random")+"'").get(0);
+            model.setSynced(0);
+            dbHelper.updateData(model);
         }
-        list.clear();
-        list.addAll(dbHelper.getAllDataFromCollectors());
-        return flag;
     }
+    list.clear();
+    list.addAll(dbHelper.getAllDataFromCollectors());
+    return flag;
+}
     private boolean setfamilyStatus(String json) throws JSONException {
-        boolean flag=true;
+        boolean flag = true;
         Log.i("jresponse293",json);
         JSONArray jsonArray=new JSONArray(json);
         for (int i=0;i<jsonArray.length();i++){
@@ -315,21 +381,35 @@ public class list_collectors extends AppCompatActivity {
         }
         return flag;
     }
+//    private boolean setfamilyStatus(String json) throws JSONException {
+//        boolean flag=true;
+//        Log.i("jresponse293",json);
+//        JSONArray jsonArray=new JSONArray(json);
+//        for (int i=0;i<jsonArray.length();i++){
+//            JSONObject details=jsonArray.getJSONObject(i);
+//            if (details.getString("Status").equals("Success")) {b
+//                flag=true;
+//            }else{
+//                flag=false;
+//            }
+//        }
+//        return flag;
+//    }
 
 
 
     private JSONArray getFamilyRequestBody(FamilyData familyData , String cid){
-        JSONArray jsonArray = new JSONArray();
+
             JSONObject jsonObject = new JSONObject();
             try {
                 VSSUser user = new SharedPref(list_collectors.this).getVSS();
                 jsonObject.put("Cid",cid);
-                jsonObject.put("Random",familyData.getUid());
+                jsonObject.put("Random",familyData.getFamilyid());
                 jsonObject.put("CollectorName",familyData.getFamily_name());
                 jsonObject.put("Village",familyData.getVillage());
                 jsonObject.put("DivisionId",user.getDivisionId());
                 jsonObject.put("RangeId",user.getRangeId());
-//                    jsonObject.put("RegionId",model.getRange());
+//              jsonObject.put("RegionId",model.getRange());
                 jsonObject.put("VSSId",user.getVid());
                 jsonObject.put("SocialCategory",familyData.getCategory());
                 jsonObject.put("Age",familyData.getAge());
@@ -354,18 +434,13 @@ public class list_collectors extends AppCompatActivity {
             } catch (JSONException e) {
                 e.printStackTrace();
             }
-            jsonArray.put(jsonObject);
-            Log.i("Collectors318", jsonArray.toString());
+            jsonArray1.put(jsonObject);
+            Log.i("Collectors318", jsonArray1.toString());
 
-        return jsonArray;
+        return jsonArray1;
     }
     private class uploadfamilyTask extends AsyncTask<String,String,String> {
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            spinKitView.setVisibility(View.VISIBLE);
-            btnFlag = true;
-        }
+
 
         @Override
         protected String doInBackground(String... strings) {
@@ -383,6 +458,7 @@ public class list_collectors extends AppCompatActivity {
                 Response response = client.newCall(request).execute();
                 if (setfamilyStatus(response.body().string()))
                     return getResources().getString(R.string.synced);
+
                 else
                     return getResources().getString(R.string.familydetailsnotsynced);
             } catch (Exception e) {

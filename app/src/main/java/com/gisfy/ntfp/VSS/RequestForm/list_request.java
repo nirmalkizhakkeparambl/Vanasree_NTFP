@@ -23,6 +23,8 @@ import com.gisfy.ntfp.SqliteHelper.DBHelper;
 import com.gisfy.ntfp.Utils.FCMNotifications;
 import com.gisfy.ntfp.Utils.SharedPref;
 import com.gisfy.ntfp.Utils.SnackBarUtils;
+import com.gisfy.ntfp.VSS.Inventory.adapter_inventory;
+import com.gisfy.ntfp.VSS.Inventory.list_inventory;
 import com.github.ybq.android.spinkit.SpinKitView;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.datepicker.MaterialDatePicker;
@@ -35,6 +37,7 @@ import org.json.JSONObject;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -78,6 +81,7 @@ public class list_request extends AppCompatActivity {
         setContentView(R.layout.activity_list_rquest);
         initViews();
         getData();
+
         filter.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -163,6 +167,7 @@ public class list_request extends AppCompatActivity {
         initSpinners();
     }
 
+
     private void initSpinners() {
        if (pref.getString("RFOs").contains("&&rfos")) {
            String[] tosplit = pref.getString("RFOs").split("&&rfos");
@@ -179,8 +184,10 @@ public class list_request extends AppCompatActivity {
                android.R.layout.simple_spinner_dropdown_item, rfos);
        rfo.setAdapter(rfoAdapter);
        List<String> pcs=new ArrayList<>();
+
        if (dbHelper.getPCs().size()>0&&dbHelper.getPCs().get(0).getPcName()!=null) {
            for (int i=0;i<dbHelper.getPCs().size();i++){
+               Log.i("rffffoo",dbHelper.getPCs().get(i).getPcName());
                pcs.add(dbHelper.getPCs().get(i).getPcName());
                pcId.add(dbHelper.getPCs().get(i).getPcId());
            }
@@ -219,6 +226,9 @@ public class list_request extends AppCompatActivity {
             }
         });
     }
+
+
+
     private class uploadTask extends AsyncTask<String,String,String>{
         @Override
         protected void onPreExecute() {
@@ -232,7 +242,7 @@ public class list_request extends AppCompatActivity {
             Log.i("kishore232",getRequestBody().toString());
             RequestBody body = RequestBody.create(mediaType,getRequestBody().toString());
             Request request = new Request.Builder()
-                    .url("http://13.127.166.242/NTFPAPI/API/Transit")
+                    .url("http://vanasree.com/NTFPAPI/API/Transit")
                     .method("POST", body)
                     .addHeader("Content-Type", "application/json")
                     .build();

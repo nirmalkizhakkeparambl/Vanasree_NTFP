@@ -41,6 +41,7 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
         holder.title.setText(data.getTitle());
         holder.imageView.setImageResource(data.getImage());
         if (data.isSelected()){
+
             holder.cardView.setCardBackgroundColor(context.getResources().getColor(R.color.green));
             holder.cardView.setCardElevation(25);
         }else {
@@ -52,9 +53,11 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
             public void onClick(View view) {
                 holder.cardView.setCardBackgroundColor(context.getResources().getColor(R.color.green));
                 holder.cardView.setCardElevation(25);
+                Log.i("posdoa",position+".//"+data.getTitle());
                 if (data.getActivity()!=null){
                     context.startActivity(new Intent(context,data.getActivity()));
                 }else {
+
                     context.backpressCnt=1;
                     Log.i("posdoa",position+".//"+data.getTitle());
                     FragmentManager fragmentManager = context.getSupportFragmentManager();

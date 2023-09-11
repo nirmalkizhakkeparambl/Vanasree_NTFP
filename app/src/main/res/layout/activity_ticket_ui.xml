@@ -66,7 +66,7 @@
                     android:layout_height="wrap_content"
                     android:gravity="center"
                     android:padding="10dp"
-                    android:text="Vana Sam Rakshana Samiti identity card"
+                    android:text="Vana Samrakshana Samithie identity card"
                     android:textColor="@color/green"
                     android:textSize="16sp"
                     android:textStyle="bold" />
@@ -91,6 +91,8 @@
                     android:text="@string/name"
                     android:textColor="@color/black"
                     android:textSize="14sp" />
+
+
                 <TextView
                     android:id="@+id/userId"
                     android:layout_width="wrap_content"
@@ -295,7 +297,7 @@
                 android:layout_width="200dp"
                 android:layout_height="80dp"
                 android:src="@drawable/approoved"
-                android:paddingTop="30dp"
+                android:paddingTop="45dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent" />
             <de.hdodenhof.circleimageview.CircleImageView

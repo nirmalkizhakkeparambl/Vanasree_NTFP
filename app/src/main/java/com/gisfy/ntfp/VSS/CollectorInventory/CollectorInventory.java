@@ -68,8 +68,6 @@ import retrofit2.Response;
 import static com.gisfy.ntfp.RFO.Status.ToVSS.setDate;
 
 public class CollectorInventory extends AppCompatActivity {
-
-
     private TabLayout tabLayout;
     private SharedPref pref;
     public List<CollectorStockModel> list=new ArrayList<>();
@@ -198,7 +196,7 @@ public class CollectorInventory extends AppCompatActivity {
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
                 this);
         String[] titles=new String[]{"Inventory ID","NTFP","Type","Quantity","Collector","Member Name"};
-        List<List<String>> lists= Collections.singletonList(Arrays.asList(model.getInventID()+"", model.getnTFP(), model.getnTFPType(), model.getQuantity()+model.getUnit(), model.getCollectorName(),model.getmName()));
+        List<List<String>> lists= Collections.singletonList(Arrays.asList(model.getInventID()+"", model.getnTFP(), model.getnTFPType(), model.getQuantity()+" "+model.getUnit(), model.getCollectorName(),model.getmName()));
 
         new StaticChecks(this).setTableLayout(tableLayout,titles,lists);
         alertDialogBuilder
@@ -242,8 +240,11 @@ public class CollectorInventory extends AppCompatActivity {
 
         private CollectorStockModel model;
 
+
         public uploadTask(CollectorStockModel model){
             this.model = model;
+            Log.i("MMMMEEEEEMMM",model.getMemberId()+"");
+            Log.i("MMMEEMMM",model.getmName()+"");
         }
         @Override
         protected void onPreExecute() {
@@ -259,7 +260,7 @@ public class CollectorInventory extends AppCompatActivity {
             MediaType mediaType = MediaType.parse("application/json");
             RequestBody body = RequestBody.create(mediaType, strings[0]);
             Request request = new Request.Builder()
-                    .url("http://13.127.166.242/NTFPAPI/API/VSSUppdateStatusForCollectorStock")
+                    .url("http://vanasree.com/NTFPAPI/API/VSSUppdateStatusForCollectorStock")
                     .method("POST", body)
                     .addHeader("Content-Type", "application/json")
                     .build();

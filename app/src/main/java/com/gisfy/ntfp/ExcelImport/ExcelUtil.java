@@ -101,7 +101,8 @@ public class ExcelUtil {
                         }
                         list.add(itemMap);
                     }
-                }//                    Toast.makeText(context, "Not a valid Excel", Toast.LENGTH_SHORT).show();
+                }
+                                    Toast.makeText(context, "Not a valid Excel", Toast.LENGTH_SHORT).show();
 
             }
         } catch (Exception e) {

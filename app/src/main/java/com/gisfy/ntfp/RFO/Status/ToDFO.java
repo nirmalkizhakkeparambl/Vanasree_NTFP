@@ -187,7 +187,7 @@ public class ToDFO extends AppCompatActivity {
     }
 
     private void initFilterViews() {
-         filter = (Button) findViewById(R.id.save);
+        filter = (Button) findViewById(R.id.save);
         Button cancel = (Button) findViewById(R.id.cancel);
         vssSpinner = (Spinner) findViewById(R.id.title_List);
         EditText from = (EditText) findViewById(R.id.fromDate);
@@ -209,7 +209,7 @@ public class ToDFO extends AppCompatActivity {
 
 
         vssList.add("Select any option");
-Log.i("vssList209",vssList.size()+"");
+        Log.i("vssList209",vssList.size()+"");
         vssAdapter = new ArrayAdapter<String>(ToDFO.this,
                 android.R.layout.simple_spinner_dropdown_item,vssList);
         vssSpinner.setAdapter(vssAdapter);
@@ -433,6 +433,7 @@ Log.i("vssList209",vssList.size()+"");
                         json.put("DivisionId",user.getDivisionId()+"");
                         json.put("RangeId", user.getRangeId()+"");
                         getData(json);
+
                     }else{
                         SnackBarUtils.ErrorSnack(ToDFO.this,getString(R.string.unabletofetch));
                     }

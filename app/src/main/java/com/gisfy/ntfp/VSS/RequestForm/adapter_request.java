@@ -57,7 +57,7 @@ public class adapter_request extends RecyclerView.Adapter<adapter_request.ViewHo
         String month = dateParts[1];
         String day = dateParts[2];
         String datanew = day+"-"+ month+"-"+year;
-        holder.title2.setText(datanew);
+        holder.title2.setText(data.getDateandTime());
 
         holder.title3.setText(activity.getString(R.string.totalstock)+data.getQuantity());
         holder.more.setVisibility(View.GONE);
@@ -65,15 +65,16 @@ public class adapter_request extends RecyclerView.Adapter<adapter_request.ViewHo
         holder.longPresslayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String[] titles = activity.getResources().getStringArray(R.array.transit_titles);
+                String[] titles = activity.getResources().getStringArray(R.array.transit_titles2);
                 List<List<String>> rows = new ArrayList<>();
                 List<String> row = new ArrayList<>();
                 row.add(data.getnTFPmalayalamname()+"("+data.getnTFPName().split("-")[0]+")");
-                row.add(data.getQuantity()+data.getUnit());
+                row.add(data.getQuantity()+" "+data.getUnit());
                 dao = SynchroniseDatabase.getInstance(v.getContext()).ntfpDao();
                 memberModel = dao.getMemberFromMemberId(data.getMemberID());
                 String memberName;
-                if (memberModel!=null) memberName = memberModel.getName();
+                if (memberModel!=null)
+                    memberName = memberModel.getName();
                 else memberName = "";
                 row.add(memberName);
                 rows.add(row);

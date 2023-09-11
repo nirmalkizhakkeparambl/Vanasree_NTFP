@@ -48,15 +48,13 @@ public class CollectorInventoryAdapter extends RecyclerView.Adapter<CollectorInv
         holder.to.setText(activity.getString(R.string.To)+data.getvSS());
 
         holder.title2.setText(data.getnTFPType());
-        if (data.getDateTime()!=null){
-            String dateget = data.getDateTime();
-            String[] dateParts = dateget.split("-");
-            String year = dateParts[0];
-            String month = dateParts[1];
-            String day = dateParts[2];
-            String datanew = day+"-"+ month+"-"+year;
-            holder.date.setText(datanew);
-        }
+        String dateget = data.getDateTime();
+        String[] dateParts = dateget.split("-");
+        String year = dateParts[0];
+        String month = dateParts[1];
+        String day = dateParts[2];
+        String datanew = day+"-"+ month+"-"+year;
+        holder.date.setText(datanew);
         holder.more.setVisibility(View.GONE);
         if (data.getRequestStatus()!=""){
             if (data.getvSSStatus().equals("true"))

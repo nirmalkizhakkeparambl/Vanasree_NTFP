@@ -58,6 +58,7 @@ public class DBHelper extends SQLiteOpenHelper {
     public static final String NTFPNAME = "NTFPName";
     public static final String UNIT = "Unit";
     public static final String QUANTITY = "Quantity";
+    public static final String LOSE = "LoseAmound";
     public static final String MALAYALAM = "MALAYALAM";
 
     public static final String STOCKSID = "StocksId";
@@ -68,6 +69,17 @@ public class DBHelper extends SQLiteOpenHelper {
     private static String MEMBER_ID = "MemberId";
 
     public static final String COLLECTOR_INV_TABLE = "CollectorNTFPTable";
+
+
+    public static final String TABLE_5 = "COLLDetails";
+    public static final String TABLE_5_COL_ForeignKey = "FarmerId";
+    public static final String TABLE_5_COL_0 = "Id";
+    public static final String TABLE_5_COL_1 = "Relationship";
+    public static final String TABLE_5_COL_2 = "CollName";
+    public static final String TABLE_5_COL_4 = "MemID";
+    public static String TABLE_5_COL_3 = "CollId";
+    public static String TABLE_5_COL_5 = "selectVSSId";
+    public static String TABLE_5_COL_6 = "selectMMID";
 
     public DBHelper(Context context) {
         super(context, DATABASE_NAME, null, 6);
@@ -96,7 +108,7 @@ public class DBHelper extends SQLiteOpenHelper {
     private static String MEMBER_GENDER          ="Gender";
     private static String MEMBER_RANGE_ID          ="MRangeId";
     private static String MEMBER_VSS_ID          ="MVSSId";
-    private static String MEMBER_DIVISION_ID          ="MDivisionId";
+    private static String MEMBER_uDIVISION_ID          ="MDivisionId";
     private static String MEMBER_COLLECTOR_ID          ="CollectorId";
     private static String MEMBER_BANK_NAME          ="MBankName";
     @Override
@@ -107,6 +119,7 @@ public class DBHelper extends SQLiteOpenHelper {
         db.execSQL("CREATE TABLE " + TRANSIT_NTFP_TABLE + " (" + TRANSITID + " TEXT , " + NTFPNAME + " TEXT, " + MALAYALAM +  " TEXT, "  + NTFPTYPE + " TEXT, "+ UNIT + " TEXT, " + QUANTITY +  " TEXT, " +STOCKSID+ " INTEGER )");
 
         db.execSQL("CREATE TABLE " + COLLECTOR_INV_TABLE + " (" + STOCKSID + " TEXT , " + VSS + " TEXT, "+ DIVISION + " TEXT, "+ RANGE + " TEXT, "+ COLLECTOR_NAME + " TEXT, "+ NTFPNAME + " TEXT, " + NTFPTYPE + " TEXT, " + UNIT + " TEXT, " + QUANTITY +  " TEXT, " + DATE +  " TEXT, " + PAYSTATUS +  " INTEGER, "+ VSSSTATUS +  " INTEGER, " +SYNCED+ " INTEGER , " +MEMBER_ID+ " INTEGER)");
+
 
         db.execSQL(
                 "create table " + NTFP +
@@ -123,6 +136,16 @@ public class DBHelper extends SQLiteOpenHelper {
                         "pcid text," +
                         "pc text)"
         );
+
+        db.execSQL(
+                "CREATE TABLE IF NOT EXISTS " + TABLE_5 + "(" +
+                        TABLE_5_COL_0 + " INTEGER PRIMARY KEY AUTOINCREMENT," +
+                        TABLE_5_COL_1 + " VARCHAR," +
+                        TABLE_5_COL_2 + " VARCHAR," +
+                        TABLE_5_COL_3 + " VARCHAR," +
+                        TABLE_5_COL_5 + " VARCHAR," +
+                        TABLE_5_COL_6 + " VARCHAR" +
+        ")");
 
         db.execSQL(
                 "create table " + COLLECTOR_NAME +
@@ -468,6 +491,7 @@ public class DBHelper extends SQLiteOpenHelper {
         cursor.close();
         return invs;
     }
+    @SuppressLint("Range")
     public List<CollectorInventoryModel> getCollectorInv(String name){
         SQLiteDatabase db = this.getReadableDatabase();
         List<CollectorInventoryModel> invs = new ArrayList<>();
@@ -484,6 +508,7 @@ public class DBHelper extends SQLiteOpenHelper {
                 model.setNTFPType(cursor.getString(cursor.getColumnIndex(NTFPTYPE)));
                 model.setUnit(cursor.getString(cursor.getColumnIndex(UNIT)));
                 model.setQuantity( cursor.getString(cursor.getColumnIndex(QUANTITY)));
+                model.setQuantity( cursor.getString(cursor.getColumnIndex(LOSE)));
                 model.setDate( cursor.getString(cursor.getColumnIndex(DATE)));
                 model.setPayStatus(cursor.getInt(cursor.getColumnIndex(PAYSTATUS)));
                 model.setVSSStatus(cursor.getInt(cursor.getColumnIndex(VSSSTATUS)));
@@ -495,6 +520,44 @@ public class DBHelper extends SQLiteOpenHelper {
         cursor.close();
         return invs;
     }
+
+    public long addFamilyMember( String relationship, String CollName, String CollId,String selectVSSId,String selectMMid
+           ) {
+
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(TABLE_5_COL_1, relationship);
+        contentValues.put(TABLE_5_COL_2, CollName);
+        contentValues.put(TABLE_5_COL_3, CollId);
+        contentValues.put(TABLE_5_COL_5, selectVSSId);
+        contentValues.put(TABLE_5_COL_6, selectMMid);
+
+
+        SQLiteDatabase db = getWritableDatabase();
+        long result = db.insert(TABLE_5, null, contentValues);
+        return result;
+    }
+
+    public boolean updateFamilyMember(long familyMemberId, String relationship,
+                                      String CollName, String CollId,String selectdVssID,String selectdMMID) {
+
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(TABLE_5_COL_1, relationship);
+        contentValues.put(TABLE_5_COL_2, CollName);
+        contentValues.put(TABLE_5_COL_3, CollId);
+        contentValues.put(TABLE_5_COL_5, selectdVssID);
+        contentValues.put(TABLE_5_COL_6, selectdMMID);
+
+
+
+        SQLiteDatabase db = getWritableDatabase();
+        int count = db.update(TABLE_5, contentValues, TABLE_5_COL_0 + " = ?", new String[]{familyMemberId + ""});
+        if (count > 0)
+            return true;
+        else
+            return false;
+    }
+
+
 
     public String getpcIDfrompcName(String name){
         SQLiteDatabase db = this.getReadableDatabase();
@@ -802,6 +865,7 @@ public class DBHelper extends SQLiteOpenHelper {
         contentValues.put("ntfp", data.getNtfp());
         contentValues.put("unit", data.getUnit());
         contentValues.put("quantity", data.getQuantity());
+
         contentValues.put("date", data.getDate());
         contentValues.put("amount", data.getAmount());
         contentValues.put("ntfpType", data.getNtfpType());
@@ -881,7 +945,7 @@ public class DBHelper extends SQLiteOpenHelper {
             do {
                 FamilyData data = new FamilyData(
                         cursor.getString(1),
-                        cursor.getString(cursor.getColumnIndex("familyid")),
+                        cursor.getString(2),
                         cursor.getString(3),
                         cursor.getString(4),
                         cursor.getString(5),
@@ -964,9 +1028,10 @@ public class DBHelper extends SQLiteOpenHelper {
                         cursor.getString(10),
                         cursor.getString(11),
                         cursor.getString(12),
-                        cursor.getInt(13),
+                        cursor.getString(13),
                         cursor.getInt(14),
-                        cursor.getInt(15));
+                        cursor.getInt(15),
+                        cursor.getInt(16));
                 filesFolderDataModelArrayList.add(data);
             } while (cursor.moveToNext());
         }
@@ -1059,7 +1124,7 @@ public class DBHelper extends SQLiteOpenHelper {
     public List<Collector> getAllDataFromCollectors() {
         List<Collector> filesFolderDataModelArrayList = new ArrayList<Collector>();
         SQLiteDatabase db = this.getReadableDatabase();
-        Cursor cursor = db.rawQuery("select * from "+COLLECTORS+" order by synced" , null);
+        Cursor cursor = db.rawQuery("select * from " +COLLECTORS+ " order by synced " , null);
         if (cursor.moveToFirst()) {
             do {
                 Collector data = new Collector(
@@ -1109,7 +1174,7 @@ public class DBHelper extends SQLiteOpenHelper {
                       cursor.getString(cursor.getColumnIndex("collector")),
                       cursor.getString(cursor.getColumnIndex("ntfp")),
                       cursor.getString(cursor.getColumnIndex("unit")),
-                      cursor.getString(cursor.getColumnIndex("quantity")),
+                      cursor.getString(cursor.getColumnIndex("quantity")), cursor.getString(cursor.getColumnIndex("LoseAmound")),
                       cursor.getString(cursor.getColumnIndex("date")),
                       cursor.getString(cursor.getColumnIndex("amount")),
                       cursor.getString(cursor.getColumnIndex("ntfpType")),
@@ -1126,7 +1191,7 @@ public class DBHelper extends SQLiteOpenHelper {
     public List<Model_payment> getAllDataFromPayments() {
         List<Model_payment> filesFolderDataModelArrayList = new ArrayList<Model_payment>();
         SQLiteDatabase db = this.getReadableDatabase();
-        Cursor cursor = db.rawQuery("select * from " + PAYMENTS +" order by DateTime desc", null);
+        Cursor cursor = db.rawQuery(" select * from " + PAYMENTS + " order by DateTime desc ", null);
         if (cursor.moveToFirst()) {
             do {
                 Model_payment data = new Model_payment(
@@ -1219,6 +1284,11 @@ public class DBHelper extends SQLiteOpenHelper {
             }
 
     }
+    public Cursor getSingleRow(String table, String selection, String arg) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        return db.query(table, null, selection + " = ?", new String[]{arg}, null, null, null);
+    }
+
     public List<String> getTransitIds(){
         List<String> transits = new ArrayList<>();
         SQLiteDatabase db = this.getReadableDatabase();
